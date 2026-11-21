@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boleta Justa ⚡ — EJESA</title>
+<style>
+  :root { --fondo:#0f172a; --panel:#1e293b; --borde:#334155; --texto:#e2e8f0;
+          --suave:#94a3b8; --azul:#2563eb; --verde:#16a34a; --rojo:#dc2626; --ambar:#d97706; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:system-ui,sans-serif; background:var(--fondo); color:var(--texto);
+         min-height:100vh; display:flex; flex-direction:column; }
+  header { padding:14px 18px; background:var(--panel); border-bottom:2px solid var(--borde); }
+  header h1 { font-size:1.15rem; }
+  header .sub { font-size:.75rem; color:var(--suave); margin-top:3px; }
+  main { flex:1; width:100%; max-width:860px; margin:0 auto; padding:16px; }
+  .tabs { display:flex; gap:8px; margin-bottom:14px; }
+  .tabs button { background:var(--panel); color:var(--suave); border:1px solid var(--borde);
+                 border-radius:8px; padding:9px 14px; font-size:.9rem; cursor:pointer; }
+  .tabs button.activa { background:var(--azul); color:#fff; border-color:var(--azul); font-weight:600; }
+  .card { background:var(--panel); border:1px solid var(--borde); border-radius:12px;
+          padding:16px; margin-bottom:14px; }
+  .card h2 { font-size:.95rem; margin-bottom:10px; }
+  label { display:block; font-size:.78rem; color:var(--suave); margin:8px 0 3px; }
+  input[type=number], input[type=date], input[type=month] {
+    background:var(--fondo); color:var(--texto); border:1px solid var(--borde);
+    border-radius:7px; padding:8px 10px; font-size:.9rem; width:100%; }
+  .fila { display:flex; gap:12px; flex-wrap:wrap; }
+  .fila > div { flex:1; min-width:150px; }
+  .checks { display:flex; gap:16px; flex-wrap:wrap; margin:10px 0; font-size:.85rem; }
+  .checks label { display:flex; align-items:center; gap:6px; margin:0; color:var(--texto); cursor:pointer; }
+  .btn { background:var(--azul); color:#fff; border:0; border-radius:8px; padding:10px 18px;
+         font-size:.9rem; font-weight:600; cursor:pointer; margin-top:10px; }
+  .btn:hover { background:#1d4ed8; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; margin-top:8px; }
+  td, th { padding:6px 8px; border-bottom:1px solid var(--borde); text-align:left; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .total td { font-weight:700; font-size:.95rem; border-top:2px solid var(--borde); }
+  .descuento td { color:#4ade80; }
+  .ahorro { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:12px;
+            background:rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.4);
+            border-radius:10px; padding:12px; font-size:.88rem; }
+  .ahorro b { font-size:1.15rem; color:#4ade80; }
+  .badge { display:inline-block; border-radius:20px; padding:4px 12px; font-size:.8rem; font-weight:700; }
+  .badge.anticipado, .badge.prohibido_cobrado { background:rgba(220,38,38,.18); color:#f87171; border:1px solid var(--rojo); }
+  .badge.zona_gris { background:rgba(217,119,6,.18); color:#fbbf24; border:1px solid var(--ambar); }
+  .badge.plazo_cumplido, .badge.sin_punitorios { background:rgba(22,163,74,.18); color:#4ade80; border:1px solid var(--verde); }
+  .badge.fuera_de_vigencia { background:rgba(148,163,184,.15); color:var(--suave); border:1px solid var(--borde); }
+  .notas { margin-top:8px; font-size:.78rem; color:var(--suave); }
+  .notas li { margin:3px 0 3px 16px; }
+  .normativa { margin-top:8px; font-size:.76rem; color:var(--suave); font-style:italic;
+               border-left:3px solid var(--borde); padding-left:10px; }
+  .error { color:#f87171; font-size:.83rem; margin-top:8px; }
+  .fuente { font-size:.72rem; color:var(--suave); margin-top:10px; }
+  .fuente a { color:#93c5fd; }
+  footer { font-size:.7rem; color:#64748b; padding:10px 18px; background:var(--panel);
+           border-top:1px solid var(--borde); }
+  .oculto { display:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Boleta Justa</h1>
+  <div class="sub">Auditor ciudadano de facturas EJESA · datos oficiales SUSEPU · Decreto de emergencia 5658/2026</div>
+</header>
+<main>
+  <div class="tabs">
+    <button id="tab-sim" class="activa">💡 Simulador de factura</button>
+    <button id="tab-dec">🛡️ Verificador de cortes</button>
+  </div>
+
+  <section id="sec-sim">
+    <div class="card">
+      <h2>¿Qué estás pagando realmente?</h2>
+      <div class="fila">
+        <div><label>Consumo del mes (kWh — figura en tu boleta)</label>
+             <input type="number" id="kwh" min="0" step="1" value="200"></div>
+        <div><label>Mes de la factura</label>
+             <input type="month" id="mes" value="2026-08"></div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="ts"> Tarifa social provincial</label>
+        <label><input type="checkbox" id="sef" checked> Subsidio nacional SEF</label>
+        <label><input type="checkbox" id="re"> Electrodependiente</label>
+      </div>
+      <button class="btn" id="calcular">Calcular desglose</button>
+      <div class="error oculto" id="sim-error"></div>
+    </div>
+    <div class="card oculto" id="resultado"></div>
+    <div class="fuente" id="fuente-cuadro"></div>
+  </section>
+
+  <section id="sec-dec" class="oculto">
+    <div class="card">
+      <h2>🔌 ¿El corte respetó los 20 días de gracia?</h2>
+      <div class="fila">
+        <div><label>Vencimiento de la 2ª factura consecutiva impaga</label>
+             <input type="date" id="c-venc"></div>
+        <div><label>Fecha del corte</label>
+             <input type="date" id="c-corte"></div>
+      </div>
+      <button class="btn" data-verif="corte">Verificar corte</button>
+      <div id="res-corte"></div>
+    </div>
+    <div class="card">
+      <h2>📟 ¿El retiro del medidor respetó los 60 días?</h2>
+      <div class="fila">
+        <div><label>Fecha del corte</label>
+             <input type="date" id="r-corte"></div>
+        <div><label>Fecha del retiro del medidor</label>
+             <input type="date" id="r-retiro"></div>
+      </div>
+      <button class="btn" data-verif="retiro">Verificar retiro</button>
+      <div id="res-retiro"></div>
+    </div>
+    <div class="card">
+      <h2>💸 ¿Te cobraron intereses punitorios? (prohibidos)</h2>
+      <div class="fila">
+        <div><label>Monto de punitorios en la factura ($)</label>
+             <input type="number" id="p-monto" min="0" step="0.01" value="0"></div>
+        <div><label>Fecha de la factura</label>
+             <input type="date" id="p-fecha"></div>
+      </div>
+      <button class="btn" data-verif="punitorios">Verificar punitorios</button>
+      <div id="res-punitorios"></div>
+    </div>
+    <div class="fuente">Decreto Acuerdo 5658-JG/2026 (BO Nº 86, 24/07/2026), vigente hasta el 31/12/2027 ·
+      <a href="https://boletinoficial.jujuy.gob.ar/?p=434317">texto oficial</a></div>
+  </section>
+</main>
+<footer>
+  Boleta Justa · proyecto cívico — los cálculos usan el cuadro tarifario oficial publicado;
+  esto no es asesoramiento legal: mostramos desglose y normativa para que vos hagas el reclamo.
+</footer>
+<script>
+const $ = id => document.getElementById(id);
+const money = n => '$' + n.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+// tabs
+$('tab-sim').onclick = () => { $('sec-sim').classList.remove('oculto'); $('sec-dec').classList.add('oculto');
+  $('tab-sim').classList.add('activa'); $('tab-dec').classList.remove('activa'); };
+$('tab-dec').onclick = () => { $('sec-dec').classList.remove('oculto'); $('sec-sim').classList.add('oculto');
+  $('tab-dec').classList.add('activa'); $('tab-sim').classList.remove('activa'); };
+
+fetch('/api/cuadro').then(r=>r.json()).then(c=>{
+  $('fuente-cuadro').innerHTML = `Cuadro: <b>${c.resolucion}</b> (${c.publicacion}) · vigencia ${c.vigencia.desde} a ${c.vigencia.hasta} ·
+    bonificaciones cargadas: ${c.meses_bonificaciones.join(', ')} · <a href="${c.fuente}">fuente oficial</a><br>${c.nota_pass_through}`;
+});
+
+$('calcular').onclick = async () => {
+  const err = $('sim-error'); err.classList.add('oculto');
+  const body = { kwh: parseFloat($('kwh').value || '0'), mes: $('mes').value,
+                 tarifa_social: $('ts').checked, sef: $('sef').checked,
+                 electrodependiente: $('re').checked };
+  const r = await fetch('/api/calcular', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  const d = await r.json();
+  if (!r.ok) { err.textContent = '⚠ ' + (d.detail || 'error'); err.classList.remove('oculto'); $('resultado').classList.add('oculto'); return; }
+  const g = d.desglose;
+  const filas = [
+    ['Cargo fijo (' + g.categoria + ')', g.cargo_fijo, ''],
+    ['Uso de red (' + g.kwh + ' kWh)', g.uso_red_bruto, ''],
+    ['Energía (' + g.kwh + ' kWh)', g.energia_bruta, ''],
+    ['Bonificación tarifa social — cargo fijo', -g.descuento_tarifa_social_fijo, 'descuento'],
+    ['Bonificación tarifa social — uso de red', -g.descuento_tarifa_social_red, 'descuento'],
+    ['Bonificación SEF — energía', -g.descuento_sef_energia, 'descuento'],
+  ].filter(f => f[1] !== 0);
+  $('resultado').innerHTML = `
+    <h2>Desglose tarifario esperado — ${g.mes} · ${g.kwh} kWh · categoría ${g.categoria}</h2>
+    <table>${filas.map(f=>`<tr class="${f[2]}"><td>${f[0]}</td><td class="num">${money(f[1])}</td></tr>`).join('')}
+      <tr class="total"><td>Subtotal tarifario (sin impuestos)</td><td class="num">${money(g.subtotal_tarifario)}</td></tr>
+    </table>
+    ${d.ahorro > 0 ? `<div class="ahorro">Sin subsidios pagarías <b>${money(d.sin_subsidios)}</b> →
+      con tus bonificaciones: <b>${money(g.subtotal_tarifario)}</b> · ahorrás <b>${money(d.ahorro)} (${d.ahorro_pct}%)</b></div>` : ''}
+    <ul class="notas">${g.notas.map(n=>`<li>${n}</li>`).join('')}</ul>
+    <div class="fuente">Según ${g.resolucion} · la boleta real suma encima IVA, tasas municipales y otros conceptos (fase 1: parser de boletas).</div>`;
+  $('resultado').classList.remove('oculto');
+};
+
+const ETIQUETA = { anticipado:'⛔ ANTICIPADO — no respetó el plazo', zona_gris:'⚠️ ZONA GRIS — día exacto del plazo',
+  plazo_cumplido:'✅ Plazo cumplido', prohibido_cobrado:'⛔ PROHIBIDO — te cobraron punitorios',
+  sin_punitorios:'✅ Sin punitorios', fuera_de_vigencia:'ℹ️ Fuera de vigencia del decreto' };
+
+function pintar(el, d) {
+  el.innerHTML = `<div style="margin-top:10px"><span class="badge ${d.estado}">${ETIQUETA[d.estado] || d.estado}</span>
+    ${d.dias_mora_al_corte != null ? ` · ${d.dias_mora_al_corte} días de mora al corte` : ''}
+    ${d.dias_desde_corte != null ? ` · ${d.dias_desde_corte} días desde el corte` : ''}</div>
+    ${d.notas.length ? `<ul class="notas">${d.notas.map(n=>`<li>${n}</li>`).join('')}</ul>` : ''}
+    <div class="normativa">${d.normativa}</div>`;
+}
+
+document.querySelectorAll('[data-verif]').forEach(b => b.onclick = async () => {
+  const tipo = b.dataset.verif;
+  let body, url;
+  if (tipo === 'corte') { body = {vencimiento_segunda_impaga: $('c-venc').value, fecha_corte: $('c-corte').value}; url = '/api/verificar/corte'; }
+  if (tipo === 'retiro') { body = {fecha_corte: $('r-corte').value, fecha_retiro: $('r-retiro').value}; url = '/api/verificar/retiro'; }
+  if (tipo === 'punitorios') { body = {monto_punitorios: parseFloat($('p-monto').value || '0'), fecha_factura: $('p-fecha').value}; url = '/api/verificar/punitorios'; }
+  const el = $('res-' + tipo);
+  if (Object.values(body).some(v => v === '' || v == null || (typeof v === 'number' && isNaN(v)))) {
+    el.innerHTML = '<div class="error">Completá todos los campos.</div>'; return;
+  }
+  const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  const d = await r.json();
+  if (!r.ok) { el.innerHTML = `<div class="error">⚠ ${d.detail || 'error'}</div>`; return; }
+  pintar(el, d);
+});
+</script>
+</body>
+</html>

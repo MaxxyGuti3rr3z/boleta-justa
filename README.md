@@ -20,8 +20,17 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   → desglose esperado: cargo fijo, uso de red, energía, bonificaciones por
   bloques, subtotal. Honesta: no inventa bonificaciones de meses no cargados
   y avisa cuando el mes está fuera de la vigencia del cuadro.
-- Tests: `py -3.13 pruebas/test_tarifas.py` (categorías, plenos, TS+SEF,
-  topes, electrodependiente, meses sin cargar).
+- **Verificador del decreto** (`src/decreto.py`): plazos objetivos del
+  Decreto 5658 — corte (>20 días de mora de la 2ª factura impaga; el día
+  exacto 20 se marca zona gris), retiro de medidor (≥60 días tras el corte),
+  intereses punitorios (prohibidos en vigencia). Sin veredictos legales.
+- **UI web local** (`src/api.py` + `web/`, FastAPI puerto 8101): simulador
+  "¿qué estás pagando realmente?" con comparación sin/con subsidios, y
+  verificador de cortes/medidor/punitorios con badges y citas normativas.
+- Tests: `py -3.13 pruebas/test_tarifas.py` y `pruebas/test_decreto.py`.
+
+![Simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
+![Verificador: corte anticipado a los 14 días](docs/captura-verificador.png)
 
 ## Fases
 
@@ -37,8 +46,11 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ## Cómo correrlo
 
 ```
-py -3.13 pruebas\test_tarifas.py
-py -3.13 -c "import sys; sys.path.insert(0,'src'); import tarifas; print(tarifas.calcular(200, tarifa_social=True, sef=True))"
+py -3.13 pruebas\test_tarifas.py                 # tests calculadora
+py -3.13 pruebas\test_decreto.py                 # tests verificador
+py -3.13 -m venv venv                            # primera vez
+venv\Scripts\python.exe -m pip install -r requirements.txt
+venv\Scripts\python.exe src\api.py               # http://127.0.0.1:8101
 ```
 
 ## Estructura
@@ -46,8 +58,13 @@ py -3.13 -c "import sys; sys.path.insert(0,'src'); import tarifas; print(tarifas
 ```
 datos/tarifas/res297_2026-08.json   cuadro oficial estructurado (fuente BO Nº 106)
 src/tarifas.py                      calculadora: categoría, componentes, bonificaciones
+src/decreto.py                      verificador de plazos del Decreto 5658-JG/2026
+src/api.py                          FastAPI: /api/cuadro /api/calcular /api/verificar/*
+web/index.html                      UI: simulador + verificador (2 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano
+pruebas/test_decreto.py             tests de plazos (19/20/21, 59/60, punitorios)
 docs/marco-normativo.md             marco legal completo con fuentes y pendientes
+docs/captura-*.png                  capturas de la UI
 ```
 
 ## Principios

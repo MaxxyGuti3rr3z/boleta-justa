@@ -105,7 +105,13 @@ y si se cobraron intereses punitorios prohibidos.
 
 ## 4. Pendientes de verificación (fase 0 → fase 1)
 
-1. **Resolución nov-2026/ene-2027** (ver arriba).
+1. **Resolución nov-2026/ene-2027**: re-verificado el 21/11/2026 — sigue sin
+   aparecer publicada/indexada (la búsqueda devuelve Agua Potable oct-dic y
+   las nacionales ENREGE para EDENOR/EDESUR). Los precios nacionales de
+   noviembre salen de Res. SE 304/305/2026 (vistos en los considerandos de
+   ENREGE 886/887/2026); por pass through deberían trasladarse a EJESA, pero
+   falta el acto provincial del trimestre. Revisar el Boletín Oficial de
+   noviembre directamente antes de calcular facturas de noviembre en adelante.
 2. **Boletas reales (3-5)**: consiguelas el usuario (PDF de "Mi Cuenta" de EJESA
    o fotos). Sin ellas no se diseña el parser ni se modela la capa de impuestos.
 3. **Capa de impuestos**: IVA (alícuota según categoría), tasas municipales y
