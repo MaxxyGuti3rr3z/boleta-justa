@@ -1,0 +1,17 @@
+{
+  "resolucion": "420-SUSEPU/2025",
+  "publicacion": "Boletín Oficial de Jujuy Nº 136, 26/11/2025",
+  "fuente": "https://boletinoficial.jujuy.gob.ar/?p=322524",
+  "vigencia": {"desde": "2025-11-01", "hasta": "2026-01-31"},
+  "nota_pass_through": "Cargos por consumo de energía pueden cambiar dentro del trimestre por resoluciones nacionales (Res. SE 434/437/2025). Cargo fijo y uso de red corresponden al VAD provincial y no cambian en el trimestre.",
+  "t1_residencial": {"categorias": [
+    {"id": "R1", "hasta_kwh": 150, "cargo_fijo": 4218, "uso_red_kwh": 78.5342, "energia_plena_kwh": 120.9237},
+    {"id": "R2", "hasta_kwh": 250, "cargo_fijo": 4995, "uso_red_kwh": 79.8189, "energia_plena_kwh": 120.9742},
+    {"id": "R2-bis", "hasta_kwh": 350, "cargo_fijo": 4995, "uso_red_kwh": 79.8189, "energia_plena_kwh": 120.9742},
+    {"id": "R3", "hasta_kwh": 500, "cargo_fijo": 8394, "uso_red_kwh": 80.9431, "energia_plena_kwh": 120.9167},
+    {"id": "R4", "hasta_kwh": 700, "cargo_fijo": 18326, "uso_red_kwh": 82.5105, "energia_plena_kwh": 120.8914},
+    {"id": "R5", "hasta_kwh": 1400, "cargo_fijo": 27622, "uso_red_kwh": 84.0107, "energia_plena_kwh": 120.8652},
+    {"id": "R6", "hasta_kwh": 4800, "cargo_fijo": 48362, "uso_red_kwh": 87.0152, "energia_plena_kwh": 120.8826},
+    {"id": "R7", "hasta_kwh": null, "cargo_fijo": 77379, "uso_red_kwh": 88.5154, "energia_plena_kwh": 120.8826}
+  ]}
+}

@@ -20,3 +20,5 @@ jobs:
         run: python pruebas/test_decreto.py
       - name: Parser de boletas con texto SINTETICO (nunca datos reales)
         run: python pruebas/test_parser.py
+      - name: Auditoria contra cuadros historicos (seleccion por VAD)
+        run: python pruebas/test_auditoria.py

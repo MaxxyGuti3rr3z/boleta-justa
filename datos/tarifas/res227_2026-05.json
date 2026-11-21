@@ -1,0 +1,17 @@
+{
+  "resolucion": "227-SUSEPU/2026",
+  "publicacion": "Boletín Oficial de Jujuy Nº 79, 08/07/2026",
+  "fuente": "https://boletinoficial.jujuy.gob.ar/?p=433937",
+  "vigencia": {"desde": "2026-05-01", "hasta": "2026-07-31"},
+  "nota_pass_through": "Cuadro con dos columnas: MAY-JUN/26 y JUL/26. Se cargan los valores MAY-JUN; en julio la energía plena sube (R1 de 149,9075 a 158,2890) por Res. SE 151/146/2026. Cargo fijo y uso de red no cambian en el trimestre.",
+  "energia_julio_2026": {"R1": 158.2890, "R2": 158.4008, "R3": 158.2983, "R4": 158.1984, "R5": 158.1656, "R6": 158.1982, "R7": 158.1982},
+  "t1_residencial": {"categorias": [
+    {"id": "R1", "hasta_kwh": 150, "cargo_fijo": 4772, "uso_red_kwh": 88.8382, "energia_plena_kwh": 149.9075},
+    {"id": "R2", "hasta_kwh": 300, "cargo_fijo": 5651, "uso_red_kwh": 90.2915, "energia_plena_kwh": 150.0116},
+    {"id": "R3", "hasta_kwh": 500, "cargo_fijo": 9495, "uso_red_kwh": 91.5632, "energia_plena_kwh": 149.9049},
+    {"id": "R4", "hasta_kwh": 700, "cargo_fijo": 20730, "uso_red_kwh": 93.3363, "energia_plena_kwh": 149.8319},
+    {"id": "R5", "hasta_kwh": 1400, "cargo_fijo": 31246, "uso_red_kwh": 95.0333, "energia_plena_kwh": 149.7898},
+    {"id": "R6", "hasta_kwh": 4800, "cargo_fijo": 54707, "uso_red_kwh": 98.4319, "energia_plena_kwh": 149.8229},
+    {"id": "R7", "hasta_kwh": null, "cargo_fijo": 87531, "uso_red_kwh": 100.1290, "energia_plena_kwh": 149.8229}
+  ]}
+}

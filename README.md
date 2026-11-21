@@ -34,9 +34,14 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   con badges y citas normativas. Identidad: ámbar eléctrico sobre carbón,
   Space Grotesk, números tabulares. Routing por hash (#panel).
 - **Fase 1 (EN CURSO)**: parser de boletas reales (`src/parser_boletas.py`,
-  pypdf local). Extrae SOLO campos de facturación (consumo, cargos, precios
-  unitarios, bonificaciones, impuestos, agua, fechas, categoría T1TS, flags de
-  punitorios) a JSON en `boletas_reales/_parseado/` (gitignoreado).
+  pypdf local) + auditoría (`src/auditoria.py`) contra 5 cuadros históricos
+  oficiales cargados en `datos/tarifas/` (Res. 296/2025, 420/2025, 81/2026,
+  227/2026, 297/2026). El cuadro se identifica por coincidencia de los
+  componentes VAD (cargo fijo + uso de red, estables en el trimestre), NO por
+  fecha de emisión: 4 de 5 boletas calzaron con confianza alta y coincidencia
+  exacta de VAD; la energía difiere 2-4% dentro del trimestre por pass
+  through nacional (esperado). 1 boleta (ago-2025) sigue con confianza baja:
+  requiere el cuadro anterior (Res. 248/2025).
   Inspección segura con `src/inspeccionar_boletas.py`: guarda el texto crudo
   solo en `boletas_reales/_texto/` y muestra por consola únicamente líneas de
   palabras clave con números enmascarados. Tests con texto SINTÉTICO

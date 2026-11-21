@@ -1,0 +1,16 @@
+{
+  "resolucion": "81-SUSEPU/2026",
+  "publicacion": "Boletín Oficial de Jujuy Nº 29, 09/03/2026",
+  "fuente": "https://boletinoficial.jujuy.gob.ar/?p=328410",
+  "vigencia": {"desde": "2026-02-01", "hasta": "2026-04-30"},
+  "nota_pass_through": "Res. SE 22/2026 y Decreto 943/2025 (SEF, bloque base 300 kWh en feb). Los precios de energía pueden ajustarse dentro del trimestre por pass through nacional; cargo fijo y uso de red son VAD provincial (fijos en el trimestre).",
+  "t1_residencial": {"categorias": [
+    {"id": "R1", "hasta_kwh": 150, "cargo_fijo": 4512, "uso_red_kwh": 84.0110, "energia_plena_kwh": 141.7247},
+    {"id": "R2", "hasta_kwh": 250, "cargo_fijo": 5344, "uso_red_kwh": 85.3853, "energia_plena_kwh": 141.7971},
+    {"id": "R3", "hasta_kwh": 500, "cargo_fijo": 8979, "uso_red_kwh": 86.5879, "energia_plena_kwh": 141.7217},
+    {"id": "R4", "hasta_kwh": 700, "cargo_fijo": 19604, "uso_red_kwh": 88.2646, "energia_plena_kwh": 141.6730},
+    {"id": "R5", "hasta_kwh": 1400, "cargo_fijo": 29548, "uso_red_kwh": 89.8694, "energia_plena_kwh": 141.6425},
+    {"id": "R6", "hasta_kwh": 4800, "cargo_fijo": 51734, "uso_red_kwh": 93.0834, "energia_plena_kwh": 141.6658},
+    {"id": "R7", "hasta_kwh": null, "cargo_fijo": 82775, "uso_red_kwh": 94.6883, "energia_plena_kwh": 141.6658}
+  ]}
+}
