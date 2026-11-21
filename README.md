@@ -77,6 +77,24 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ![Panel auditoría: 5 boletas comparadas con cuadros oficiales](docs/captura-auditoria.png)
 ![Explicación llana de una boleta cargada desde el panel](docs/captura-explicacion.png)
 
+## Preguntas sobre la boleta (sin enviar el PDF)
+
+Después de analizar una boleta aparece una caja de preguntas. La respuesta sale
+de los números reales y del cuadro oficial (`src/preguntas.py`), sin ningún
+modelo ni llamada externa.
+
+Si se quiere una IA para conversación más fluida, el PDF **nunca** se envía:
+`src/payload_ia.py` construye un JSON con SOLO campos tarifarios permitidos
+(valida que no aparezcan nombre, dirección, DNI, CUIT, teléfono ni números de
+cuenta) y ese payload es lo único que viaja. Se puede ver en el panel con
+"Ver qué datos se usaría para una IA".
+
+Para activarla, configurar `IA_API_URL`, `IA_API_KEY` y opcionalmente
+`IA_MODELO` (endpoint compatible con chat completions). Sin esas variables la
+app responde en modo local. El prompt prohíbe inventar montos y exige citar la
+resolución. Ojo: esto NO es cero-riesgo absoluto, el proveedor de IA recibe
+datos financieros anónimos; conviene elegir uno sin retención de datos.
+
 ## Limpieza de datos sensibles
 
 ```bash
@@ -146,11 +164,15 @@ src/parser_boletas.py         parser PDF → JSON SOLO con campos tarifarios
 pruebas/test_parser.py        tests con texto sintético (nunca boletas reales)
 src/auditoria.py              selección de cuadro por VAD + comparación
 src/explicar.py               resultado en lenguaje llano (frases, acciones, glosario)
+src/preguntas.py              preguntas respondidas desde los datos, sin IA
+src/payload_ia.py             JSON mínimo validado (sin datos personales) para IA opcional
+src/ia_client.py              cliente IA opcional (solo si hay API configurada)
 scripts/limpiar_sensibles.py  borrado controlado de derivados y originales (dry-run default)
 pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
 pruebas/test_explicar.py      tests de redacción y privacidad
 pruebas/test_deploy.py        tests de modo público y rate limit
 pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
+pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano

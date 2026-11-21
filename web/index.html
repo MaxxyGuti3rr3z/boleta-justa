@@ -44,6 +44,15 @@ a{color:var(--acento)}
 .seccion-titulo{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--suave);margin:24px 0 12px}
 .expl-card{border:1px solid var(--borde);border-left:4px solid var(--verde);border-radius:var(--radio);
   background:var(--superficie);padding:22px 24px;margin-bottom:18px}
+.preguntas-card{margin-bottom:18px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip-sugerencia{background:var(--acento-suave);color:var(--acento);border:1px solid rgba(255,194,51,.35);
+  border-radius:999px;padding:6px 12px;font-size:.78rem;cursor:pointer}
+#pregunta-input{flex:1;min-width:220px;background:var(--superficie2);border:1px solid var(--borde);
+  color:var(--tinta);border-radius:10px;padding:11px 14px;font-family:inherit}
+.respuesta-box{margin-top:14px;padding:14px 16px;border-left:3px solid var(--acento);
+  background:var(--acento-suave);border-radius:8px;font-size:.88rem;line-height:1.55}
+#payload-ia{font-size:.7rem;color:var(--suave);white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}
 .expl-card.a_revisar{border-left-color:var(--acento)}
 .expl-card.sin_datos{border-left-color:var(--suave)}
 .expl-card h2{font-size:1.25rem;margin-bottom:6px}
@@ -432,6 +441,22 @@ table.desglose .total td:last-child{color:var(--acento)}
         </div>
       </div>
       <div id="aud-explicacion"></div>
+
+      <div class="card preguntas-card" id="preguntas-card">
+        <span class="dec-tag">Preguntá sobre tu boleta</span>
+        <h2>¿Querés saber algo puntual?</h2>
+        <p class="card-sub">Respondemos SOLO con los datos de tu boleta y el cuadro oficial.
+          El PDF no se envía a ningún lado.</p>
+        <div class="chips" id="sugerencias"></div>
+        <div class="subir-fila">
+          <input id="pregunta-input" placeholder="Ej: ¿por qué me subió?" autocomplete="off">
+          <button id="btn-preguntar" class="btn-primary">Preguntar</button>
+        </div>
+        <div id="respuesta-pregunta"></div>
+        <details class="expl-glosario"><summary>Ver qué datos se usarían para una IA (sin datos personales)</summary>
+          <pre id="payload-ia">Analizá una boleta para ver el payload.</pre></details>
+      </div>
+
       <h3 class="seccion-titulo ejemplo-local">Ejemplos ya auditados</h3>
       <div id="aud-lista" class="ejemplo-local"></div>
     </section>
@@ -561,7 +586,7 @@ btnAnalizar.addEventListener('click', () => {
   fetch('/api/auditar', {method: 'POST', body: datos})
     .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(t); }))
     .then(d => {
-      pintarExplicacion(d.explicacion);
+      pintarExplicacion(d.explicacion, d.payload);
       estado.textContent = 'Listo. Tu boleta no se guardó en ningún lado.';
       pdfInput.value = '';
     })
@@ -570,7 +595,23 @@ btnAnalizar.addEventListener('click', () => {
       $('aud-explicacion').innerHTML = '<div class="error">No se pudo analizar el archivo.</div>';
     });
 });
-function pintarExplicacion(x) {
+let ultimoPayload = null;
+const SUGERENCIAS = [
+  '¿Por qué me subió la boleta?', '¿Qué es el cargo fijo?',
+  '¿Qué son los impuestos?', '¿Tengo bonificación de tarifa social?',
+  '¿Hay intereses por pago tarde?'
+];
+$('sugerencias').innerHTML = SUGERENCIAS.map(s =>
+  `<button type="button" class="chip-sugerencia" data-preg="${s}">${s}</button>`).join('');
+document.querySelectorAll('.chip-sugerencia').forEach(b => b.onclick = () => {
+  $('pregunta-input').value = b.dataset.preg;
+  $('btn-preguntar').click();
+});
+
+function pintarExplicacion(x, payload) {
+  ultimoPayload = payload || null;
+  $('payload-ia').textContent = ultimoPayload
+    ? JSON.stringify(ultimoPayload, null, 2) : 'Analizá una boleta para ver el payload.';
   const items = x.items.map(i => `<div class="expl-item"><span class="ico">${i.icono}</span>` +
     `<div><b>${i.titulo}</b><p>${i.texto}</p></div></div>`).join('');
   const acciones = x.acciones.map(a => `<li>${a}</li>`).join('');
@@ -585,6 +626,33 @@ function pintarExplicacion(x) {
   </div>`;
   $('aud-explicacion').scrollIntoView({behavior: 'smooth', block: 'nearest'});
 }
+
+/* ---------- preguntas sobre la boleta (solo con datos mínimos) ---------- */
+$('btn-preguntar').onclick = () => {
+  const pregunta = $('pregunta-input').value.trim();
+  if (!pregunta) return;
+  if (!ultimoPayload) {
+    $('respuesta-pregunta').innerHTML = '<div class="respuesta-box">Primero analizá una boleta.</div>';
+    return;
+  }
+  $('respuesta-pregunta').innerHTML = '<div class="respuesta-box">Leyendo los datos…</div>';
+  fetch('/api/preguntar', {method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({pregunta, payload: ultimoPayload})})
+    .then(r => r.ok ? r.json() : r.json().then(d => { throw new Error(d.detail || 'error'); }))
+    .then(d => {
+      const modo = d.modo === 'ia' ? 'IA con datos mínimos' : 'respuesta local';
+      $('respuesta-pregunta').innerHTML =
+        `<div class="respuesta-box"><b>${modo}</b><br>${d.respuesta}` +
+        `<div class="fuente-linea">Fuente: ${d.fuente}</div></div>`;
+    })
+    .catch(e => {
+      $('respuesta-pregunta').innerHTML =
+        `<div class="respuesta-box">No pude responder: ${e.message}</div>`;
+    });
+};
+$('pregunta-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') $('btn-preguntar').click();
+});
 
 /* ---------- auditoría local (solo datos tarifarios, sin datos personales) ---------- */
 function cargarAuditoria() {

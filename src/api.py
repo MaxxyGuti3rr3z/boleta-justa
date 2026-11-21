@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 
 try:
-    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config
+    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config, payload_ia, preguntas, ia_client
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
@@ -24,6 +24,9 @@ except ImportError:  # ejecución directa: python src/api.py
     import parser_boletas
     import explicar
     import config
+    import payload_ia
+    import preguntas
+    import ia_client
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -150,8 +153,36 @@ async def auditar_pdf(request: Request, file: UploadFile = File(...)):
             raise HTTPException(422, "No pudimos leer el PDF. ¿Es una boleta de EJESA?")
     # acá ya no queda ningún archivo del usuario en disco
     resultado = auditoria.auditar(boleta, auditoria.cargar_tablas())
+    datos = payload_ia.construir(boleta, resultado)
     return {"auditoria": resultado,
-            "explicacion": explicar.explicar(resultado, boleta)}
+            "explicacion": explicar.explicar(resultado, boleta),
+            "payload": datos}
+
+
+class PreguntaIn(BaseModel):
+    pregunta: str
+    payload: dict
+
+
+@app.post("/api/preguntar")
+def preguntar(p: PreguntaIn):
+    """Responde sobre la boleta. El payload ya viene sin datos personales:
+    el PDF nunca se envía, y si hay IA configurada recibe SOLO ese JSON."""
+    try:
+        payload_ia.validar(p.payload)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    if not p.pregunta.strip():
+        raise HTTPException(422, "Escribí una pregunta")
+    local = preguntas.responder(p.pregunta, p.payload, p.payload.get("auditoria", {}))
+    if ia_client.configurada():
+        try:
+            texto = ia_client.consultar(payload_ia.mensajes(p.payload, p.pregunta))
+            if texto:
+                return {**local, "respuesta": texto, "modo": "ia", "payload": p.payload}
+        except Exception:
+            pass  # fallback a respuesta local, sin logs con datos
+    return {**local, "payload": p.payload}
 
 
 @app.get("/api/auditoria")

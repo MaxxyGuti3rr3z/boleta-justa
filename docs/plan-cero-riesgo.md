@@ -46,11 +46,13 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
    personales y aumenta el riesgo, contrario al objetivo. Solo tendría sentido
    para historial entre dispositivos; si se quiere, que sea opcional y con
    datos cifrados en el propio navegador.
-2. **Preguntas sobre la boleta**: se recomienda responder desde los datos ya
-   parseados con cálculo determinístico (¿por qué subió?, ¿qué es este cargo?,
-   ¿coincide con el cuadro?). Una API de IA externa implicaría enviar la boleta
-   a un tercero y puede inventar montos. La alternativa privada es IA local en
-   el navegador, más pesada y con modelos chicos.
+2. **Preguntas sobre la boleta**: ya resuelto con `src/payload_ia.py`: se extraen
+   los datos localmente y solo viaja un JSON con campos tarifarios permitidos
+   (sin nombre, dirección, DNI, CUIT ni números de cuenta). La IA es opcional
+   y solo recibe ese payload validado; nunca el PDF. Igualmente, el proveedor
+   de IA sí recibe datos financieros anónimos: eso NO es cero-riesgo absoluto,
+   pero es el límite acordado. La respuesta por defecto es determinística,
+   sin modelo ni llamada externa.
 
 ## Orden de trabajo sugerido
 

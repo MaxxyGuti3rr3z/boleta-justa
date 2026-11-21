@@ -28,3 +28,5 @@ jobs:
         run: python pruebas/test_deploy.py
       - name: Limpieza de datos sensibles (dry-run / apply / total)
         run: python pruebas/test_limpieza.py
+      - name: Payload mínimo para IA y preguntas locales (sin datos personales)
+        run: python pruebas/test_preguntas.py
