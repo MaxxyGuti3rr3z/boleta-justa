@@ -1,5 +1,7 @@
 # Boleta Justa ⚡
 
+[![tests](https://github.com/MaxxyGuti3rr3z/boleta-justa/actions/workflows/tests.yml/badge.svg)](https://github.com/MaxxyGuti3rr3z/boleta-justa/actions/workflows/tests.yml)
+
 Auditor ciudadano de facturas de EJESA (electricidad de Jujuy) + canal digital
 de reclamos donde no hay oficinas físicas. Proyecto cívico hermano de
 [cuando-llega-jujuy](https://github.com/MaxxyGuti3rr3z/cuando-llega-jujuy):
