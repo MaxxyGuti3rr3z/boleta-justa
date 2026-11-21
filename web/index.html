@@ -3,158 +3,432 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Boleta Justa ⚡ — EJESA</title>
+<title>Boleta Justa — tu boleta de luz, sin letra chica</title>
+<meta name="description" content="Auditor ciudadano de facturas EJESA (Jujuy): desglose con el cuadro tarifario oficial y verificación de tus derechos durante la emergencia tarifaria.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --fondo:#0f172a; --panel:#1e293b; --borde:#334155; --texto:#e2e8f0;
-          --suave:#94a3b8; --azul:#2563eb; --verde:#16a34a; --rojo:#dc2626; --ambar:#d97706; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:system-ui,sans-serif; background:var(--fondo); color:var(--texto);
-         min-height:100vh; display:flex; flex-direction:column; }
-  header { padding:14px 18px; background:var(--panel); border-bottom:2px solid var(--borde); }
-  header h1 { font-size:1.15rem; }
-  header .sub { font-size:.75rem; color:var(--suave); margin-top:3px; }
-  main { flex:1; width:100%; max-width:860px; margin:0 auto; padding:16px; }
-  .tabs { display:flex; gap:8px; margin-bottom:14px; }
-  .tabs button { background:var(--panel); color:var(--suave); border:1px solid var(--borde);
-                 border-radius:8px; padding:9px 14px; font-size:.9rem; cursor:pointer; }
-  .tabs button.activa { background:var(--azul); color:#fff; border-color:var(--azul); font-weight:600; }
-  .card { background:var(--panel); border:1px solid var(--borde); border-radius:12px;
-          padding:16px; margin-bottom:14px; }
-  .card h2 { font-size:.95rem; margin-bottom:10px; }
-  label { display:block; font-size:.78rem; color:var(--suave); margin:8px 0 3px; }
-  input[type=number], input[type=date], input[type=month] {
-    background:var(--fondo); color:var(--texto); border:1px solid var(--borde);
-    border-radius:7px; padding:8px 10px; font-size:.9rem; width:100%; }
-  .fila { display:flex; gap:12px; flex-wrap:wrap; }
-  .fila > div { flex:1; min-width:150px; }
-  .checks { display:flex; gap:16px; flex-wrap:wrap; margin:10px 0; font-size:.85rem; }
-  .checks label { display:flex; align-items:center; gap:6px; margin:0; color:var(--texto); cursor:pointer; }
-  .btn { background:var(--azul); color:#fff; border:0; border-radius:8px; padding:10px 18px;
-         font-size:.9rem; font-weight:600; cursor:pointer; margin-top:10px; }
-  .btn:hover { background:#1d4ed8; }
-  table { width:100%; border-collapse:collapse; font-size:.85rem; margin-top:8px; }
-  td, th { padding:6px 8px; border-bottom:1px solid var(--borde); text-align:left; }
-  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
-  .total td { font-weight:700; font-size:.95rem; border-top:2px solid var(--borde); }
-  .descuento td { color:#4ade80; }
-  .ahorro { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:12px;
-            background:rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.4);
-            border-radius:10px; padding:12px; font-size:.88rem; }
-  .ahorro b { font-size:1.15rem; color:#4ade80; }
-  .badge { display:inline-block; border-radius:20px; padding:4px 12px; font-size:.8rem; font-weight:700; }
-  .badge.anticipado, .badge.prohibido_cobrado { background:rgba(220,38,38,.18); color:#f87171; border:1px solid var(--rojo); }
-  .badge.zona_gris { background:rgba(217,119,6,.18); color:#fbbf24; border:1px solid var(--ambar); }
-  .badge.plazo_cumplido, .badge.sin_punitorios { background:rgba(22,163,74,.18); color:#4ade80; border:1px solid var(--verde); }
-  .badge.fuera_de_vigencia { background:rgba(148,163,184,.15); color:var(--suave); border:1px solid var(--borde); }
-  .notas { margin-top:8px; font-size:.78rem; color:var(--suave); }
-  .notas li { margin:3px 0 3px 16px; }
-  .normativa { margin-top:8px; font-size:.76rem; color:var(--suave); font-style:italic;
-               border-left:3px solid var(--borde); padding-left:10px; }
-  .error { color:#f87171; font-size:.83rem; margin-top:8px; }
-  .fuente { font-size:.72rem; color:var(--suave); margin-top:10px; }
-  .fuente a { color:#93c5fd; }
-  footer { font-size:.7rem; color:#64748b; padding:10px 18px; background:var(--panel);
-           border-top:1px solid var(--borde); }
-  .oculto { display:none; }
+:root{
+  --fondo:#0c0e12; --superficie:#14171d; --superficie2:#1a1e26; --borde:#242a35;
+  --tinta:#e8eaf0; --suave:#9aa3b2; --apagado:#828c9e;
+  --acento:#ffc233; --acento-tinta:#1a1400; --acento-suave:rgba(255,194,51,.12);
+  --verde:#34d399; --verde-fondo:rgba(52,211,153,.1);
+  --rojo:#f87171; --rojo-fondo:rgba(248,113,113,.1);
+  --gris-zona:#fbbf24; --gris-fondo:rgba(251,191,36,.1);
+  --radio:14px; --display:'Space Grotesk',system-ui,sans-serif;
+  --mono:ui-monospace,'Cascadia Code','JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--display);background:var(--fondo);color:var(--tinta);
+     font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+a{color:var(--acento)}
+.oculta{display:none!important}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- botones ---------- */
+.btn-primary{background:var(--acento);color:var(--acento-tinta);border:0;border-radius:10px;
+  padding:13px 24px;font-size:.95rem;font-weight:700;letter-spacing:.2px;
+  transition:transform .15s ease,box-shadow .15s ease}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(255,194,51,.25)}
+.btn-primary:focus-visible{outline:2px solid var(--tinta);outline-offset:2px}
+.btn-ghost{background:transparent;color:var(--tinta);border:1px solid var(--borde);
+  border-radius:10px;padding:12px 20px;font-size:.9rem;font-weight:500;text-decoration:none;
+  display:inline-block;transition:border-color .15s ease}
+.btn-ghost:hover{border-color:var(--suave)}
+
+/* ---------- landing ---------- */
+#landing{max-width:1120px;margin:0 auto;padding:0 24px}
+.l-nav{display:flex;align-items:center;gap:20px;padding:22px 0;border-bottom:1px solid var(--borde)}
+.logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.05rem;letter-spacing:.2px}
+.logo .rayo{color:var(--acento);font-size:1.2rem}
+.l-nav .links{margin-left:auto;display:flex;gap:20px;align-items:center}
+.l-nav .links a{color:var(--suave);text-decoration:none;font-size:.85rem}
+.l-nav .links a:hover{color:var(--tinta)}
+.l-nav .btn-primary{padding:9px 18px;font-size:.85rem}
+
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;
+      padding:72px 0 64px;position:relative}
+.hero::before{content:'';position:absolute;top:-120px;left:-180px;width:520px;height:520px;
+  background:radial-gradient(circle,rgba(255,194,51,.07) 0%,transparent 65%);pointer-events:none}
+.kicker{font-size:.78rem;font-weight:500;color:var(--acento);letter-spacing:1.6px;
+        text-transform:uppercase;margin-bottom:18px}
+.hero h1{font-size:clamp(2.3rem,4.6vw,3.6rem);line-height:1.08;font-weight:700;letter-spacing:-.5px}
+.hero h1 em{font-style:normal;color:var(--acento)}
+.lead{color:var(--suave);font-size:1.02rem;margin:20px 0 28px;max-width:46ch;text-wrap:pretty}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-datos{list-style:none;margin-top:36px;display:flex;flex-direction:column;gap:10px}
+.hero-datos li{font-size:.83rem;color:var(--suave);display:flex;gap:10px;align-items:baseline}
+.hero-datos b{color:var(--tinta);font-weight:700;white-space:nowrap}
+.hero-datos .fuente-mini{color:var(--apagado);font-size:.72rem}
+
+/* recibo real del hero */
+.recibo{background:var(--superficie);border:1px solid var(--borde);border-radius:var(--radio);
+  padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.45);position:relative}
+.recibo::before{content:'';position:absolute;inset:0 0 auto 0;height:3px;
+  background:var(--acento);border-radius:var(--radio) var(--radio) 0 0}
+.recibo-cab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.recibo-cab .t{font-size:.8rem;font-weight:700;letter-spacing:.4px}
+.recibo-cab .m{font-size:.7rem;color:var(--apagado);font-family:var(--mono)}
+.recibo table{width:100%;border-collapse:collapse;font-size:.82rem}
+.recibo td{padding:6px 0;border-bottom:1px dashed var(--borde)}
+.recibo td:last-child{text-align:right;font-family:var(--mono);font-size:.78rem}
+.recibo .bonif td{color:var(--verde)}
+.recibo .total td{border-bottom:0;border-top:2px solid var(--borde);font-weight:700;
+  font-size:.95rem;padding-top:10px}
+.recibo .total td:last-child{color:var(--acento);font-size:.95rem}
+.recibo-pie{margin-top:12px;font-size:.7rem;color:var(--apagado);line-height:1.5}
+.recibo-ahorro{margin-top:10px;background:var(--verde-fondo);border:1px solid rgba(52,211,153,.3);
+  border-radius:9px;padding:9px 12px;font-size:.78rem;color:var(--verde)}
+
+/* secciones landing */
+.seccion{padding:56px 0;border-top:1px solid var(--borde)}
+.seccion h2{font-size:1.5rem;font-weight:700;letter-spacing:-.2px}
+.section-sub{color:var(--suave);font-size:.85rem;margin-top:6px}
+.derechos-tabla{margin-top:28px;display:flex;flex-direction:column;gap:0}
+.derecho{display:grid;grid-template-columns:130px 1fr;gap:20px;padding:20px 0;
+         border-bottom:1px solid var(--borde)}
+.derecho:last-child{border-bottom:0}
+.derecho .plazo{font-size:1.7rem;font-weight:700;color:var(--acento);line-height:1.1}
+.derecho .plazo small{display:block;font-size:.68rem;color:var(--apagado);font-weight:500;
+                      letter-spacing:.6px;text-transform:uppercase;margin-top:4px}
+.derecho .detalle h3{font-size:.95rem;font-weight:700;margin-bottom:5px}
+.derecho .detalle p{font-size:.83rem;color:var(--suave)}
+.derecho .cita{font-family:var(--mono);font-size:.7rem;color:var(--apagado);margin-top:8px;
+  border-left:2px solid var(--borde);padding-left:10px;font-style:normal}
+.pasos{list-style:none;margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:paso}
+.pasos li{counter-increment:paso;position:relative;padding-top:8px}
+.pasos li::before{content:counter(paso,decimal-leading-zero);font-family:var(--mono);
+  font-size:.8rem;color:var(--acento);display:block;margin-bottom:10px}
+.pasos h3{font-size:.98rem;font-weight:700;margin-bottom:6px}
+.pasos p{font-size:.83rem;color:var(--suave)}
+.cta-final{text-align:left;padding:64px 0;border-top:1px solid var(--borde);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.cta-final h2{font-size:1.6rem;max-width:22ch}
+.l-footer{border-top:1px solid var(--borde);padding:28px 0 40px;font-size:.72rem;
+  color:var(--apagado);line-height:1.7}
+.l-footer a{color:var(--suave)}
+
+/* ---------- panel ---------- */
+#panel{min-height:100vh;display:flex;flex-direction:column}
+.p-nav{display:flex;align-items:center;gap:16px;padding:14px 24px;
+  background:var(--superficie);border-bottom:1px solid var(--borde);flex-wrap:wrap}
+.p-nav .logo{background:none;border:0;color:var(--tinta);font-size:1rem}
+.p-nav .logo:hover .rayo{transform:scale(1.15)}
+.p-nav .rayo{transition:transform .15s ease}
+.segmentado{display:flex;background:var(--fondo);border:1px solid var(--borde);
+  border-radius:10px;padding:3px;margin:0 auto}
+.segmentado button{background:transparent;border:0;color:var(--suave);border-radius:8px;
+  padding:8px 18px;font-size:.85rem;font-weight:500;transition:all .15s ease}
+.segmentado button.activa{background:var(--acento);color:var(--acento-tinta);font-weight:700}
+.cuadro-badge{font-size:.7rem;color:var(--apagado);font-family:var(--mono)}
+.p-main{flex:1;width:100%;max-width:1120px;margin:0 auto;padding:28px 24px}
+.p-grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+.card{background:var(--superficie);border:1px solid var(--borde);border-radius:var(--radio);padding:22px}
+.card h2{font-size:1rem;font-weight:700;margin-bottom:4px}
+.card .card-sub{font-size:.78rem;color:var(--suave);margin-bottom:16px}
+label{display:block;font-size:.75rem;font-weight:500;color:var(--suave);margin:14px 0 5px;
+      letter-spacing:.3px}
+input[type=number],input[type=date],input[type=month]{
+  background:var(--fondo);color:var(--tinta);border:1px solid var(--borde);border-radius:9px;
+  padding:11px 12px;font-size:.92rem;width:100%;font-family:var(--display);
+  transition:border-color .15s ease}
+input:focus{outline:none;border-color:var(--acento)}
+input:focus-visible{outline:2px solid var(--acento);outline-offset:1px}
+.checks{display:flex;flex-direction:column;gap:9px;margin:16px 0 4px}
+.checks label{display:flex;align-items:center;gap:9px;margin:0;color:var(--tinta);
+  font-size:.85rem;cursor:pointer}
+.checks input{width:17px;height:17px;accent-color:var(--acento);cursor:pointer}
+.btn-calc{width:100%;margin-top:18px}
+.error{color:var(--rojo);font-size:.82rem;margin-top:12px;background:var(--rojo-fondo);
+  border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:10px 12px}
+.vacio{color:var(--apagado);font-size:.88rem;padding:36px 12px;text-align:center;line-height:1.7}
+.vacio .rayo-grande{font-size:2rem;display:block;margin-bottom:12px;opacity:.5}
+
+/* resultados */
+.res-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+  margin-bottom:14px}
+.res-cab h2{font-size:1rem}
+.res-cab .meta{font-size:.72rem;color:var(--apagado);font-family:var(--mono)}
+table.desglose{width:100%;border-collapse:collapse;font-size:.87rem}
+table.desglose td{padding:9px 4px;border-bottom:1px solid var(--borde)}
+table.desglose td:last-child{text-align:right;font-family:var(--mono);font-size:.82rem}
+table.desglose .descuento td{color:var(--verde)}
+table.desglose .total td{font-weight:700;font-size:1rem;border-top:2px solid var(--borde);
+  border-bottom:0;padding-top:12px}
+table.desglose .total td:last-child{color:var(--acento)}
+.ahorro{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px;
+  background:var(--verde-fondo);border:1px solid rgba(52,211,153,.3);border-radius:11px;
+  padding:14px 16px;font-size:.85rem;color:var(--suave)}
+.ahorro b{color:var(--verde);font-size:1.05rem}
+.notas{margin-top:14px;font-size:.76rem;color:var(--apagado);list-style:none}
+.notas li{padding:4px 0 4px 16px;position:relative}
+.notas li::before{content:'·';position:absolute;left:4px;color:var(--acento)}
+.fuente-linea{margin-top:14px;font-size:.7rem;color:var(--apagado);font-family:var(--mono)}
+
+/* verificador */
+.dec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:start}
+.dec-grid .card.primaria{border-color:rgba(255,194,51,.4)}
+.dec-tag{font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--acento);margin-bottom:8px;display:block}
+.badge{display:inline-block;border-radius:20px;padding:5px 13px;font-size:.76rem;font-weight:700;
+  margin-top:14px}
+.badge.anticipado,.badge.prohibido_cobrado{background:var(--rojo-fondo);color:var(--rojo);
+  border:1px solid rgba(248,113,113,.45)}
+.badge.zona_gris{background:var(--gris-fondo);color:var(--gris-zona);border:1px solid rgba(251,191,36,.45)}
+.badge.plazo_cumplido,.badge.sin_punitorios{background:var(--verde-fondo);color:var(--verde);
+  border:1px solid rgba(52,211,153,.45)}
+.badge.fuera_de_vigencia{background:var(--superficie2);color:var(--suave);border:1px solid var(--borde)}
+.dec-dias{font-size:.8rem;color:var(--suave);margin-top:8px}
+.normativa{margin-top:12px;font-family:var(--mono);font-size:.68rem;color:var(--apagado);
+  border-left:2px solid var(--borde);padding-left:10px;line-height:1.6}
+.p-footer{border-top:1px solid var(--borde);padding:14px 24px;font-size:.7rem;
+  color:var(--apagado);background:var(--superficie);line-height:1.6}
+.p-footer a{color:var(--suave)}
+
+/* transición entre vistas */
+.vista{animation:aparecer .25s ease}
+@keyframes aparecer{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .vista{animation:none}html{scroll-behavior:auto}
+  .btn-primary:hover{transform:none}
+}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:36px;padding:48px 0}
+  .p-grid{grid-template-columns:1fr}
+  .dec-grid{grid-template-columns:1fr}
+  .pasos{grid-template-columns:1fr;gap:22px}
+  .derecho{grid-template-columns:90px 1fr;gap:14px}
+  .l-nav .links a{display:none}
+  .cuadro-badge{display:none}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>⚡ Boleta Justa</h1>
-  <div class="sub">Auditor ciudadano de facturas EJESA · datos oficiales SUSEPU · Decreto de emergencia 5658/2026</div>
-</header>
-<main>
-  <div class="tabs">
-    <button id="tab-sim" class="activa">💡 Simulador de factura</button>
-    <button id="tab-dec">🛡️ Verificador de cortes</button>
-  </div>
 
-  <section id="sec-sim">
-    <div class="card">
-      <h2>¿Qué estás pagando realmente?</h2>
-      <div class="fila">
-        <div><label>Consumo del mes (kWh — figura en tu boleta)</label>
-             <input type="number" id="kwh" min="0" step="1" value="200"></div>
-        <div><label>Mes de la factura</label>
-             <input type="month" id="mes" value="2026-08"></div>
-      </div>
-      <div class="checks">
-        <label><input type="checkbox" id="ts"> Tarifa social provincial</label>
-        <label><input type="checkbox" id="sef" checked> Subsidio nacional SEF</label>
-        <label><input type="checkbox" id="re"> Electrodependiente</label>
-      </div>
-      <button class="btn" id="calcular">Calcular desglose</button>
-      <div class="error oculto" id="sim-error"></div>
+<!-- ============ LANDING (Decide/Learn) ============ -->
+<div id="landing" class="vista">
+  <nav class="l-nav">
+    <span class="logo"><span class="rayo">⚡</span>Boleta Justa</span>
+    <div class="links">
+      <a href="#derechos">Tus derechos</a>
+      <a href="#como">Cómo funciona</a>
+      <button class="btn-primary" data-ir-panel>Abrir el panel</button>
     </div>
-    <div class="card oculto" id="resultado"></div>
-    <div class="fuente" id="fuente-cuadro"></div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <p class="kicker">Proyecto cívico · Jujuy · datos oficiales SUSEPU</p>
+      <h1>Tu boleta de luz,<br><em>sin letra chica.</em></h1>
+      <p class="lead">Boleta Justa desglosa tu factura de EJESA con el cuadro tarifario
+        oficial y verifica si se respetaron tus derechos durante la emergencia
+        energética y tarifaria. Sin depender de la empresa.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" data-ir-panel>Abrir el panel</button>
+        <a class="btn-ghost" href="https://boletinoficial.jujuy.gob.ar/?p=434317" target="_blank" rel="noopener">Decreto 5658/2026 ↗</a>
+      </div>
+      <ul class="hero-datos">
+        <li><b>Hasta 45%</b> de una boleta pueden ser impuestos y extras
+          <span class="fuente-mini">(Qué Pasa Jujuy, jun-2026)</span></li>
+        <li><b>20 días</b> de gracia antes de un corte por falta de pago
+          <span class="fuente-mini">(Decreto 5658, Art. 3.A)</span></li>
+        <li><b>50,7%</b> de ahorro con tarifa social + SEF en el ejemplo de 200 kWh
+          <span class="fuente-mini">(Res. 297-SUSEPU/2026)</span></li>
+      </ul>
+    </div>
+    <aside class="recibo" aria-label="Ejemplo de desglose real">
+      <div class="recibo-cab"><span class="t">DESGLOSE REAL</span><span class="m">200 kWh · ago-2026 · R2</span></div>
+      <table>
+        <tr><td>Cargo fijo</td><td class="num">$6.058,00</td></tr>
+        <tr><td>Uso de red</td><td class="num">$19.361,24</td></tr>
+        <tr><td>Energía</td><td class="num">$31.839,22</td></tr>
+        <tr class="bonif"><td>Tarifa social + SEF</td><td class="num">−$29.002,59</td></tr>
+        <tr class="total"><td>Subtotal tarifario</td><td class="num">$28.255,87</td></tr>
+      </table>
+      <div class="recibo-ahorro">Sin subsidios: <b class="num">$57.258,46</b> — la diferencia es tu derecho.</div>
+      <p class="recibo-pie">Calculado con la Res. 297-SUSEPU/2026 (BO Nº 106). La boleta real
+        suma encima IVA y tasas municipales: eso es lo que vas a poder auditar.</p>
+    </aside>
+  </header>
+
+  <section id="derechos" class="seccion">
+    <h2>Lo que la emergencia te garantiza</h2>
+    <p class="section-sub">Decreto Acuerdo 5658-JG/2026 · usuarios T1 (&lt;15 kW) · vigente hasta el 31/12/2027</p>
+    <div class="derechos-tabla">
+      <div class="derecho">
+        <div class="plazo num">20<small>días corridos</small></div>
+        <div class="detalle">
+          <h3>Antes de cortarte la luz</h3>
+          <p>El corte por falta de pago solo puede efectivizarse después de 20 días corridos
+             de mora de la <b>segunda factura consecutiva impaga</b>. El panel verifica la fecha exacta.</p>
+          <p class="cita">Art. 3.A — "recién después de los veinte (20) días corridos de mora de la segunda factura consecutiva impaga"</p>
+        </div>
+      </div>
+      <div class="derecho">
+        <div class="plazo num">60<small>días tras el corte</small></div>
+        <div class="detalle">
+          <h3>Antes de retirar tu medidor</h3>
+          <p>El retiro del medidor recién puede hacerse una vez cumplidos 60 días posteriores
+             al corte — evita los costos de reinstalación.</p>
+          <p class="cita">Art. 3.B — "una vez cumplidos sesenta (60) días posteriores del corte del suministro"</p>
+        </div>
+      </div>
+      <div class="derecho">
+        <div class="plazo num">$0<small>intereses punitorios</small></div>
+        <div class="detalle">
+          <h3>Prohibidos durante la emergencia</h3>
+          <p>No se pueden cobrar intereses punitorios sobre deudas de energía (y de agua
+             para consumos ≤30 m³/mes). Si tu boleta los trae, el panel te lo marca.</p>
+          <p class="cita">Art. 3.C — "PROHIBIR el cobro de los intereses punitorios" · Art. 7 para Agua Potable</p>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section id="sec-dec" class="oculto">
-    <div class="card">
-      <h2>🔌 ¿El corte respetó los 20 días de gracia?</h2>
-      <div class="fila">
-        <div><label>Vencimiento de la 2ª factura consecutiva impaga</label>
-             <input type="date" id="c-venc"></div>
-        <div><label>Fecha del corte</label>
-             <input type="date" id="c-corte"></div>
-      </div>
-      <button class="btn" data-verif="corte">Verificar corte</button>
-      <div id="res-corte"></div>
-    </div>
-    <div class="card">
-      <h2>📟 ¿El retiro del medidor respetó los 60 días?</h2>
-      <div class="fila">
-        <div><label>Fecha del corte</label>
-             <input type="date" id="r-corte"></div>
-        <div><label>Fecha del retiro del medidor</label>
-             <input type="date" id="r-retiro"></div>
-      </div>
-      <button class="btn" data-verif="retiro">Verificar retiro</button>
-      <div id="res-retiro"></div>
-    </div>
-    <div class="card">
-      <h2>💸 ¿Te cobraron intereses punitorios? (prohibidos)</h2>
-      <div class="fila">
-        <div><label>Monto de punitorios en la factura ($)</label>
-             <input type="number" id="p-monto" min="0" step="0.01" value="0"></div>
-        <div><label>Fecha de la factura</label>
-             <input type="date" id="p-fecha"></div>
-      </div>
-      <button class="btn" data-verif="punitorios">Verificar punitorios</button>
-      <div id="res-punitorios"></div>
-    </div>
-    <div class="fuente">Decreto Acuerdo 5658-JG/2026 (BO Nº 86, 24/07/2026), vigente hasta el 31/12/2027 ·
-      <a href="https://boletinoficial.jujuy.gob.ar/?p=434317">texto oficial</a></div>
+  <section id="como" class="seccion">
+    <h2>Cómo funciona</h2>
+    <ol class="pasos">
+      <li><h3>Cargá tu consumo</h3><p>Los kWh y el mes figuran en tu boleta. No hace falta
+        subir ningún documento: todo se calcula en tu máquina.</p></li>
+      <li><h3>Mirá cada peso</h3><p>Cargo fijo, uso de red, energía y bonificaciones desglosados
+        contra el cuadro oficial, con la comparación sin/con subsidios.</p></li>
+      <li><h3>Verificá y reclamá</h3><p>Fechas de corte y retiro contra los plazos del decreto.
+        El panel muestra la normativa exacta para que armes tu reclamo ante SUSEPU.</p></li>
+    </ol>
   </section>
-</main>
-<footer>
-  Boleta Justa · proyecto cívico — los cálculos usan el cuadro tarifario oficial publicado;
-  esto no es asesoramiento legal: mostramos desglose y normativa para que vos hagas el reclamo.
-</footer>
+
+  <section class="cta-final">
+    <h2>La información es pública. Tu boleta también debería serlo.</h2>
+    <button class="btn-primary" data-ir-panel>Abrir el panel</button>
+  </section>
+
+  <footer class="l-footer">
+    Fuentes: <a href="https://boletinoficial.jujuy.gob.ar/?p=435659">Res. 297-SUSEPU/2026 (BO Nº 106)</a> ·
+    <a href="https://boletinoficial.jujuy.gob.ar/?p=434317">Decreto Acuerdo 5658-JG/2026 (BO Nº 86)</a> ·
+    Res. SUSEPU 048/24 (tarifa social) · Decreto 943/2025 (SEF).<br>
+    Boleta Justa es un proyecto cívico independiente: no es asesoramiento legal ni está afiliado a EJESA.
+    Los cálculos usan el cuadro tarifario oficial publicado; mostramos desglose y normativa para que vos hagas el reclamo.
+  </footer>
+</div>
+
+<!-- ============ PANEL (Operate) ============ -->
+<div id="panel" class="vista oculta">
+  <nav class="p-nav">
+    <button class="logo" data-ir-landing title="Volver al inicio"><span class="rayo">⚡</span>Boleta Justa</button>
+    <div class="segmentado" role="tablist">
+      <button id="tab-sim" class="activa" role="tab">Simulador</button>
+      <button id="tab-dec" role="tab">Verificador</button>
+    </div>
+    <span class="cuadro-badge" id="cuadro-badge"></span>
+  </nav>
+
+  <main class="p-main">
+    <section id="sec-sim" class="p-grid">
+      <div class="card">
+        <h2>¿Qué estás pagando realmente?</h2>
+        <p class="card-sub">Desglose según el cuadro tarifario oficial vigente publicado.</p>
+        <label for="kwh">Consumo del mes (kWh — figura en tu boleta)</label>
+        <input type="number" id="kwh" min="0" step="1" value="200">
+        <label for="mes">Mes de la factura</label>
+        <input type="month" id="mes" value="2026-08">
+        <div class="checks">
+          <label><input type="checkbox" id="ts"> Tarifa social provincial</label>
+          <label><input type="checkbox" id="sef" checked> Subsidio nacional SEF</label>
+          <label><input type="checkbox" id="re"> Electrodependiente</label>
+        </div>
+        <button class="btn-primary btn-calc" id="calcular">Calcular desglose</button>
+        <div class="error oculta" id="sim-error"></div>
+      </div>
+      <div class="card" id="resultado">
+        <div class="vacio"><span class="rayo-grande">⚡</span>
+          Ingresá tu consumo y calculá:<br>vas a ver cada peso de tu boleta desglosado,<br>
+          con tus bonificaciones y la comparación sin subsidios.</div>
+      </div>
+    </section>
+
+    <section id="sec-dec" class="oculta">
+      <div class="dec-grid">
+        <div class="card primaria">
+          <span class="dec-tag">Corte de suministro</span>
+          <h2>¿Respetó los 20 días de gracia?</h2>
+          <p class="card-sub">Segunda factura consecutiva impaga → fecha del corte.</p>
+          <label for="c-venc">Vencimiento de la 2ª factura impaga</label>
+          <input type="date" id="c-venc">
+          <label for="c-corte">Fecha del corte</label>
+          <input type="date" id="c-corte">
+          <button class="btn-primary btn-calc" data-verif="corte">Verificar corte</button>
+          <div id="res-corte"></div>
+        </div>
+        <div class="card">
+          <span class="dec-tag">Retiro de medidor</span>
+          <h2>¿Respetó los 60 días?</h2>
+          <p class="card-sub">El retiro recién procede tras 60 días del corte.</p>
+          <label for="r-corte">Fecha del corte</label>
+          <input type="date" id="r-corte">
+          <label for="r-retiro">Fecha del retiro del medidor</label>
+          <input type="date" id="r-retiro">
+          <button class="btn-primary btn-calc" data-verif="retiro">Verificar retiro</button>
+          <div id="res-retiro"></div>
+        </div>
+        <div class="card">
+          <span class="dec-tag">Intereses punitorios</span>
+          <h2>¿Te los cobraron? Están prohibidos</h2>
+          <p class="card-sub">Durante la emergencia (hasta dic-2027).</p>
+          <label for="p-monto">Monto de punitorios en la factura ($)</label>
+          <input type="number" id="p-monto" min="0" step="0.01" value="0">
+          <label for="p-fecha">Fecha de la factura</label>
+          <input type="date" id="p-fecha">
+          <button class="btn-primary btn-calc" data-verif="punitorios">Verificar punitorios</button>
+          <div id="res-punitorios"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="p-footer" id="panel-footer">
+    Proyecto cívico — esto no es asesoramiento legal: mostramos desglose y normativa para que vos hagas el reclamo.
+  </footer>
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 const money = n => '$' + n.toLocaleString('es-AR', {minimumFractionDigits:2, maximumFractionDigits:2});
 
-// tabs
-$('tab-sim').onclick = () => { $('sec-sim').classList.remove('oculto'); $('sec-dec').classList.add('oculto');
+/* ---------- routing landing ↔ panel ---------- */
+function irPanel(){ $('landing').classList.add('oculta'); $('panel').classList.remove('oculta');
+  history.replaceState(null,'','#panel'); window.scrollTo(0,0); }
+function irLanding(){ $('panel').classList.add('oculta'); $('landing').classList.remove('oculta');
+  history.replaceState(null,'',location.pathname); window.scrollTo(0,0); }
+document.querySelectorAll('[data-ir-panel]').forEach(b => b.onclick = irPanel);
+document.querySelectorAll('[data-ir-landing]').forEach(b => b.onclick = irLanding);
+if (location.hash === '#panel') irPanel();
+
+/* ---------- tabs del panel ---------- */
+$('tab-sim').onclick = () => { $('sec-sim').classList.remove('oculta'); $('sec-dec').classList.add('oculta');
   $('tab-sim').classList.add('activa'); $('tab-dec').classList.remove('activa'); };
-$('tab-dec').onclick = () => { $('sec-dec').classList.remove('oculto'); $('sec-sim').classList.add('oculto');
+$('tab-dec').onclick = () => { $('sec-dec').classList.remove('oculta'); $('sec-sim').classList.add('oculta');
   $('tab-dec').classList.add('activa'); $('tab-sim').classList.remove('activa'); };
 
+/* ---------- cuadro vigente ---------- */
 fetch('/api/cuadro').then(r=>r.json()).then(c=>{
-  $('fuente-cuadro').innerHTML = `Cuadro: <b>${c.resolucion}</b> (${c.publicacion}) · vigencia ${c.vigencia.desde} a ${c.vigencia.hasta} ·
-    bonificaciones cargadas: ${c.meses_bonificaciones.join(', ')} · <a href="${c.fuente}">fuente oficial</a><br>${c.nota_pass_through}`;
+  $('cuadro-badge').textContent = `${c.resolucion} · ${c.vigencia.desde.slice(0,7)} → ${c.vigencia.hasta.slice(0,7)}`;
+  $('panel-footer').innerHTML = `Cuadro: <a href="${c.fuente}">${c.resolucion}</a> (${c.publicacion}) ·
+    bonificaciones cargadas: ${c.meses_bonificaciones.join(', ')} · pass through nacional: ${c.nota_pass_through}<br>
+    Proyecto cívico — esto no es asesoramiento legal: mostramos desglose y normativa para que vos hagas el reclamo.`;
 });
 
+/* ---------- simulador ---------- */
 $('calcular').onclick = async () => {
-  const err = $('sim-error'); err.classList.add('oculto');
+  const err = $('sim-error'); err.classList.add('oculta');
   const body = { kwh: parseFloat($('kwh').value || '0'), mes: $('mes').value,
                  tarifa_social: $('ts').checked, sef: $('sef').checked,
                  electrodependiente: $('re').checked };
   const r = await fetch('/api/calcular', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
   const d = await r.json();
-  if (!r.ok) { err.textContent = '⚠ ' + (d.detail || 'error'); err.classList.remove('oculto'); $('resultado').classList.add('oculto'); return; }
+  if (!r.ok) { err.textContent = '⚠ ' + (d.detail || 'error'); err.classList.remove('oculta'); return; }
   const g = d.desglose;
   const filas = [
     ['Cargo fijo (' + g.categoria + ')', g.cargo_fijo, ''],
@@ -165,25 +439,26 @@ $('calcular').onclick = async () => {
     ['Bonificación SEF — energía', -g.descuento_sef_energia, 'descuento'],
   ].filter(f => f[1] !== 0);
   $('resultado').innerHTML = `
-    <h2>Desglose tarifario esperado — ${g.mes} · ${g.kwh} kWh · categoría ${g.categoria}</h2>
-    <table>${filas.map(f=>`<tr class="${f[2]}"><td>${f[0]}</td><td class="num">${money(f[1])}</td></tr>`).join('')}
+    <div class="res-cab"><h2>Desglose tarifario esperado</h2>
+      <span class="meta">${g.mes} · ${g.kwh} kWh · ${g.categoria}</span></div>
+    <table class="desglose">${filas.map(f=>`<tr class="${f[2]}"><td>${f[0]}</td><td class="num">${money(f[1])}</td></tr>`).join('')}
       <tr class="total"><td>Subtotal tarifario (sin impuestos)</td><td class="num">${money(g.subtotal_tarifario)}</td></tr>
     </table>
-    ${d.ahorro > 0 ? `<div class="ahorro">Sin subsidios pagarías <b>${money(d.sin_subsidios)}</b> →
-      con tus bonificaciones: <b>${money(g.subtotal_tarifario)}</b> · ahorrás <b>${money(d.ahorro)} (${d.ahorro_pct}%)</b></div>` : ''}
+    ${d.ahorro > 0 ? `<div class="ahorro">Sin subsidios pagarías <b class="num">${money(d.sin_subsidios)}</b> →
+      con tus bonificaciones <b class="num">${money(g.subtotal_tarifario)}</b> · ahorrás <b class="num">${money(d.ahorro)} (${d.ahorro_pct}%)</b></div>` : ''}
     <ul class="notas">${g.notas.map(n=>`<li>${n}</li>`).join('')}</ul>
-    <div class="fuente">Según ${g.resolucion} · la boleta real suma encima IVA, tasas municipales y otros conceptos (fase 1: parser de boletas).</div>`;
-  $('resultado').classList.remove('oculto');
+    <div class="fuente-linea">Según ${g.resolucion} · la boleta real suma IVA, tasas municipales y otros conceptos (fase 1: parser).</div>`;
 };
 
-const ETIQUETA = { anticipado:'⛔ ANTICIPADO — no respetó el plazo', zona_gris:'⚠️ ZONA GRIS — día exacto del plazo',
-  plazo_cumplido:'✅ Plazo cumplido', prohibido_cobrado:'⛔ PROHIBIDO — te cobraron punitorios',
-  sin_punitorios:'✅ Sin punitorios', fuera_de_vigencia:'ℹ️ Fuera de vigencia del decreto' };
+/* ---------- verificador ---------- */
+const ETIQUETA = { anticipado:'ANTICIPADO — no respetó el plazo', zona_gris:'ZONA GRIS — día exacto del plazo',
+  plazo_cumplido:'Plazo cumplido', prohibido_cobrado:'PROHIBIDO — te cobraron punitorios',
+  sin_punitorios:'Sin punitorios', fuera_de_vigencia:'Fuera de vigencia del decreto' };
 
 function pintar(el, d) {
-  el.innerHTML = `<div style="margin-top:10px"><span class="badge ${d.estado}">${ETIQUETA[d.estado] || d.estado}</span>
-    ${d.dias_mora_al_corte != null ? ` · ${d.dias_mora_al_corte} días de mora al corte` : ''}
-    ${d.dias_desde_corte != null ? ` · ${d.dias_desde_corte} días desde el corte` : ''}</div>
+  el.innerHTML = `<span class="badge ${d.estado}">${ETIQUETA[d.estado] || d.estado}</span>
+    ${d.dias_mora_al_corte != null ? `<div class="dec-dias num">${d.dias_mora_al_corte} días de mora al corte</div>` : ''}
+    ${d.dias_desde_corte != null ? `<div class="dec-dias num">${d.dias_desde_corte} días desde el corte</div>` : ''}
     ${d.notas.length ? `<ul class="notas">${d.notas.map(n=>`<li>${n}</li>`).join('')}</ul>` : ''}
     <div class="normativa">${d.normativa}</div>`;
 }

@@ -24,13 +24,18 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   Decreto 5658 — corte (>20 días de mora de la 2ª factura impaga; el día
   exacto 20 se marca zona gris), retiro de medidor (≥60 días tras el corte),
   intereses punitorios (prohibidos en vigencia). Sin veredictos legales.
-- **UI web local** (`src/api.py` + `web/`, FastAPI puerto 8101): simulador
-  "¿qué estás pagando realmente?" con comparación sin/con subsidios, y
-  verificador de cortes/medidor/punitorios con badges y citas normativas.
+- **UI web local** (`src/api.py` + `web/`, FastAPI puerto 8101): landing page
+  moderna (hero con desglose real de ejemplo, derechos del decreto con citas
+  textuales, cómo funciona) que lleva al panel con dos herramientas: simulador
+  "¿qué estás pagando realmente?" (formulario → desglose en dos columnas,
+  comparación sin/con subsidios) y verificador de cortes/medidor/punitorios
+  con badges y citas normativas. Identidad: ámbar eléctrico sobre carbón,
+  Space Grotesk, números tabulares. Routing por hash (#panel).
 - Tests: `py -3.13 pruebas/test_tarifas.py` y `pruebas/test_decreto.py`.
 
-![Simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
-![Verificador: corte anticipado a los 14 días](docs/captura-verificador.png)
+![Landing: tu boleta de luz, sin letra chica](docs/captura-landing.png)
+![Panel simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
+![Panel verificador: corte anticipado y punitorios prohibidos](docs/captura-verificador.png)
 
 ## Fases
 
