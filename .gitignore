@@ -1,0 +1,21 @@
+# Dependencias y cachés
+venv/
+__pycache__/
+*.pyc
+
+# PRIVACIDAD: boletas de usuarios (datos personales) — NUNCA commitear ni subir.
+# Las boletas reales van exclusively acá y se procesan local-first.
+boletas_reales/
+
+# Red de seguridad: documentos sueltos en la raíz del repo (por si caen fuera
+# de boletas_reales/). Las capturas de docs/ NO se ignoran (son de la UI).
+/*.pdf
+/*.jpg
+/*.jpeg
+/*.png
+/*.heic
+/*.webp
+
+# Herramientas externas
+.atl/
+.junie/
