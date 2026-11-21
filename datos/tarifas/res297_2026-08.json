@@ -1,0 +1,64 @@
+{
+  "resolucion": "297-SUSEPU/2026",
+  "publicacion": "Boletín Oficial de Jujuy Nº 106, 04/09/2026",
+  "fuente": "https://boletinoficial.jujuy.gob.ar/?p=435659",
+  "vigencia": {"desde": "2026-08-01", "hasta": "2026-10-31"},
+  "nota_pass_through": "El Art. 2 de la Res. 297 incorpora automáticamente las variaciones nacionales de precios (Pass Through) durante el trimestre; el VAD provincial queda fijo. EJESA publica como vigente esta resolución + Res. SE Nación 222, 225 y 272/2026. La resolución del trimestre nov-2026/ene-2027 NO estaba publicada/indexada al 21/11/2026: verificar antes de calcular facturas de noviembre en adelante.",
+  "t1_residencial": {
+    "nota": "Categoría por consumo mensual total. Los cargos por uso de red y energía se aplican a TODO el consumo al precio de la categoría (no son bloques progresivos). Las bonificaciones SÍ se aplican por bloques.",
+    "categorias": [
+      {"id": "R1", "hasta_kwh": 150, "cargo_fijo": 5116, "uso_red_kwh": 95.2480, "energia_plena_kwh": 159.1174},
+      {"id": "R2", "hasta_kwh": 300, "cargo_fijo": 6058, "uso_red_kwh": 96.8062, "energia_plena_kwh": 159.1961},
+      {"id": "R3", "hasta_kwh": 500, "cargo_fijo": 10180, "uso_red_kwh": 98.1696, "energia_plena_kwh": 159.1277},
+      {"id": "R4", "hasta_kwh": 700, "cargo_fijo": 22226, "uso_red_kwh": 100.0706, "energia_plena_kwh": 159.0507},
+      {"id": "R5", "hasta_kwh": 1400, "cargo_fijo": 33501, "uso_red_kwh": 101.8901, "energia_plena_kwh": 159.0314},
+      {"id": "R6", "hasta_kwh": 4800, "cargo_fijo": 58654, "uso_red_kwh": 105.5339, "energia_plena_kwh": 159.0535},
+      {"id": "R7", "hasta_kwh": null, "cargo_fijo": 93847, "uso_red_kwh": 107.3535, "energia_plena_kwh": 159.0535}
+    ],
+    "especiales": {
+      "RC": {"nombre": "Servicios Comunitarios", "cargo_fijo": 112616, "uso_red_kwh": 92.8341, "energia_plena_kwh": 159.0535},
+      "RE": {"nombre": "Electrodependientes", "cargo_fijo": 28154, "uso_red_kwh": 95.2480, "energia_plena_kwh": 159.1174}
+    }
+  },
+  "bonificaciones": {
+    "nota": "Las bonificaciones cambian MES A MES (tabla de la Res. 297: ene 75%, feb 72,73%, mar 70,45%, abr 68,18%, may 60,67%, jun 61,97%, jul 69,59%, ago 69,59% total SEF). Solo agosto está cargado con los valores publicados del Anexo I; cargar los demás meses desde sus anexos antes de usarlos.",
+    "2026-08": {
+      "fuente": "Res. 297-SUSEPU/2026 Anexo I, BONIFICACIONES (vigencia 1-31/8/2026)",
+      "tarifa_social": {
+        "base_normativa": "Res. SUSEPU 048/24: consumo máximo subsidiado 300 kWh/mes; cargo fijo 100%; variable primeros 150 kWh 25%, entre 150 y 300 kWh 15%",
+        "cargo_fijo_pct": 100,
+        "solo_categorias": ["R1", "R2"],
+        "uso_red_bloques": [
+          {"hasta_kwh": 150, "descuento_kwh": 23.8120},
+          {"hasta_kwh": 300, "descuento_kwh": 14.5210}
+        ]
+      },
+      "sef": {
+        "base_normativa": "Decreto 943/2025 (SEF): bloque base 300 kWh en ene/feb/may/jun/jul/ago/dic y 150 kWh en mar/abr/sep/oct/nov (más diferenciales por zona bioambiental, Res. SE 13/2026)",
+        "bloque_base_kwh": 300,
+        "energia_bloques": [
+          {"hasta_kwh": 150, "descuento_kwh": 93.2206},
+          {"hasta_kwh": 300, "descuento_kwh": 93.2730}
+        ]
+      },
+      "electrodependientes": {
+        "cargo_fijo_descuento": 28154,
+        "uso_red_descuento_kwh": 95.2480,
+        "energia_descuento_kwh": 159.1174
+      }
+    }
+  },
+  "cargos_suspension_rehabilitacion": {
+    "T1_monofasico": 17647,
+    "T1_monofasico_tarifa_social": 17647,
+    "T1_trifasico": 83489,
+    "T2_T3_T4_T5": 83489
+  },
+  "parametros": {
+    "lambda_cens_kwh": 2534.60,
+    "nota": "Coeficiente de Variación del Costo de Distribución de Referencia y Costo de Energía No Suministrada, desde 1/8/2026 (Art. 3 Res. 297)"
+  },
+  "impuestos": {
+    "nota": "El cuadro tarifario NO incluye la capa de impuestos (IVA, tasas municipales, otros conceptos) que la boleta suma encima. Esa capa se modelará con boletas reales (fase 1)."
+  }
+}
