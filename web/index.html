@@ -38,6 +38,28 @@ a{color:var(--acento)}
   border-radius:10px;padding:12px 20px;font-size:.9rem;font-weight:500;text-decoration:none;
   display:inline-block;transition:border-color .15s ease}
 .btn-ghost:hover{border-color:var(--suave)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.subir-fila{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.subir-fila .btn-primary{font-size:.85rem;padding:11px 18px}
+.seccion-titulo{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--suave);margin:24px 0 12px}
+.expl-card{border:1px solid var(--borde);border-left:4px solid var(--verde);border-radius:var(--radio);
+  background:var(--superficie);padding:22px 24px;margin-bottom:18px}
+.expl-card.a_revisar{border-left-color:var(--acento)}
+.expl-card.sin_datos{border-left-color:var(--suave)}
+.expl-card h2{font-size:1.25rem;margin-bottom:6px}
+.expl-resumen{color:var(--suave);font-size:.9rem;line-height:1.55;margin-bottom:14px}
+.expl-item{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:12px 0;border-top:1px solid var(--borde)}
+.expl-item .ico{font-size:1.05rem}
+.expl-item b{font-size:.9rem}
+.expl-item p{margin:2px 0 0;color:var(--suave);font-size:.85rem;line-height:1.55}
+.expl-acciones{margin-top:16px;padding:14px 16px;background:var(--acento-suave);border-radius:10px}
+.expl-acciones b{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em}
+.expl-acciones ul{margin:6px 0 0;padding-left:18px}
+.expl-acciones li{font-size:.82rem;color:var(--suave);margin:5px 0}
+details.expl-glosario{margin-top:14px}
+details.expl-glosario summary{cursor:pointer;color:var(--acento);font-size:.85rem;font-weight:700}
+details.expl-glosario div{padding:8px 0;border-top:1px solid var(--borde);font-size:.82rem;color:var(--suave)}
+details.expl-glosario b{color:var(--tinta)}
 
 /* ---------- landing ---------- */
 #landing{max-width:1120px;margin:0 auto;padding:0 24px}
@@ -399,11 +421,19 @@ table.desglose .total td:last-child{color:var(--acento)}
       <div class="dec-grid" style="margin-bottom:14px">
         <div class="card" style="grid-column:1/-1">
           <span class="dec-tag">Auditoría local</span>
-          <h2>Tus boletas contra el cuadro oficial de su trimestre</h2>
-          <p class="card-sub">Se identifica el cuadro por cargo fijo + uso de red (VAD), que no cambian
-            dentro del trimestre. La energía puede diferir por pass through nacional: eso NO es un error.</p>
+          <h2>Tu boleta, explicada con palabras simples</h2>
+          <p class="card-sub">Elegí el PDF de tu boleta de EJESA. Lo analizamos acá nomás, en tu
+            computadora: no se sube a ningún servidor, no se guarda y nunca mostramos tus datos personales.</p>
+          <div class="subir-fila">
+            <label class="btn-primary" for="pdf-input" style="cursor:pointer">Elegir mi boleta (PDF)</label>
+            <input type="file" id="pdf-input" accept="application/pdf,.pdf" hidden>
+            <button id="btn-analizar" class="btn-primary" disabled>Analizar mi boleta</button>
+            <span id="subir-estado" class="dec-dias"></span>
+          </div>
         </div>
       </div>
+      <div id="aud-explicacion"></div>
+      <h3 class="seccion-titulo">Ejemplos ya auditados</h3>
       <div id="aud-lista"></div>
     </section>
   </main>
@@ -504,6 +534,48 @@ document.querySelectorAll('[data-verif]').forEach(b => b.onclick = async () => {
   if (!r.ok) { el.innerHTML = `<div class="error">⚠ ${d.detail || 'error'}</div>`; return; }
   pintar(el, d);
 });
+
+/* ---------- subir una boleta y explicarla con palabras simples ---------- */
+const pdfInput = $('pdf-input');
+const btnAnalizar = $('btn-analizar');
+pdfInput.addEventListener('change', () => {
+  const f = pdfInput.files[0];
+  btnAnalizar.disabled = !f;
+  $('subir-estado').textContent = f ? f.name + ' · listo para analizar' : '';
+});
+btnAnalizar.addEventListener('click', () => {
+  const f = pdfInput.files[0];
+  if (!f) return;
+  const estado = $('subir-estado');
+  estado.textContent = 'Leyendo tu boleta…';
+  btnAnalizar.disabled = true;
+  const datos = new FormData();
+  datos.append('file', f);
+  fetch('/api/auditar', {method: 'POST', body: datos})
+    .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(t); }))
+    .then(d => {
+      pintarExplicacion(d.explicacion);
+      estado.textContent = 'Listo. Tu boleta no se guardó en ningún lado.';
+      pdfInput.value = '';
+    })
+    .catch(() => {
+      estado.textContent = 'No pudimos leer el PDF. ¿Es una boleta de EJESA?';
+      $('aud-explicacion').innerHTML = '<div class="error">No se pudo analizar el archivo.</div>';
+    });
+});
+function pintarExplicacion(x) {
+  const items = x.items.map(i => `<div class="expl-item"><span class="ico">${i.icono}</span>` +
+    `<div><b>${i.titulo}</b><p>${i.texto}</p></div></div>`).join('');
+  const acciones = x.acciones.map(a => `<li>${a}</li>`).join('');
+  const glosario = x.glosario.map(g => `<div><b>${g.termino}:</b> ${g.significado}</div>`).join('');
+  $('aud-explicacion').innerHTML = `<div class="expl-card ${x.estado}">
+    <h2>${x.titulo}</h2><p class="expl-resumen">${x.resumen}</p>
+    ${items}
+    <div class="expl-acciones"><b>Qué podés hacer</b><ul>${acciones}</ul></div>
+    <details class="expl-glosario"><summary>Ver glosario (palabras raras)</summary>${glosario}</details>
+  </div>`;
+  $('aud-explicacion').scrollIntoView({behavior: 'smooth', block: 'nearest'});
+}
 
 /* ---------- auditoría local (solo datos tarifarios, sin datos personales) ---------- */
 function cargarAuditoria() {

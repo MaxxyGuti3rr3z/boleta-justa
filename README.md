@@ -46,6 +46,11 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   con aritmética exacta p. ej. 150×69,2325 + 39,5×70,3651 = 13.164,30
   (Res. 296) y 150×65,0152 + 55×66,0788 = 13.386,62 (Res. 168). La bonificación
   TS está en el renglón propio, no descontada del precio unitario.
+- **Subí tu boleta desde el panel**: pestaña "Auditoría" → "Elegir mi boleta (PDF)".
+  El PDF se procesa en tu máquina (FastAPI local), se borra al terminar y la
+  respuesta es una explicación en palabras simples, sin importes ni datos
+  personales. Incluye frase por renglón, qué podés hacer y glosario.
+  Endpoint `POST /api/auditar` (máx. 12 MB).
 - **Panel con pestaña "Auditoría"**: 5 tarjetas con resolución elegida,
   confianza, chips OK/DIFIERE, notas de pass through y señales de punitorios.
   Endpoint `GET /api/auditoria` devuelve SOLO campos de comparación: nunca
@@ -70,6 +75,7 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ![Panel simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
 ![Panel verificador: corte anticipado y punitorios prohibidos](docs/captura-verificador.png)
 ![Panel auditoría: 5 boletas comparadas con cuadros oficiales](docs/captura-auditoria.png)
+![Explicación llana de una boleta cargada desde el panel](docs/captura-explicacion.png)
 
 ## Fases
 
@@ -101,8 +107,10 @@ src/inspeccionar_boletas.py   inspección segura (consola enmascarada, texto cru
 src/parser_boletas.py         parser PDF → JSON SOLO con campos tarifarios
 pruebas/test_parser.py        tests con texto sintético (nunca boletas reales)
 src/auditoria.py              selección de cuadro por VAD + comparación
+src/explicar.py               resultado en lenguaje llano (frases, acciones, glosario)
 pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
-src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria
+pruebas/test_explicar.py      tests de redacción y privacidad
+src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano
 pruebas/test_decreto.py             tests de plazos (19/20/21, 59/60, punitorios)

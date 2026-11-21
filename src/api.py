@@ -3,20 +3,24 @@
 Uso:  python src/api.py  → http://127.0.0.1:8101
 (venv: venv\Scripts\python.exe src\api.py)
 """
+from tempfile import TemporaryDirectory
+
 import json
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:
-    from . import tarifas, decreto, auditoria
+    from . import tarifas, decreto, auditoria, parser_boletas, explicar
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
     import auditoria
+    import parser_boletas
+    import explicar
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -97,6 +101,31 @@ def verificar_punitorios(p: PunitoriosIn):
         return decreto.verificar_punitorios(p.monto_punitorios, p.fecha_factura)
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+@app.post("/api/auditar")
+async def auditar_pdf(file: UploadFile = File(...)):
+    """Recibe un PDF de boleta, lo analiza en memoria local y devuelve SOLO
+    la explicación en lenguaje llano. No guarda el archivo ni datos personales."""
+    nombre = (file.filename or "").lower()
+    if not nombre.endswith(".pdf"):
+        raise HTTPException(415, "Solo se aceptan archivos PDF")
+    datos = await file.read()
+    if not datos or len(datos) > 12_000_000:
+        raise HTTPException(413, "El PDF debe pesar menos de 12 MB")
+    # TemporaryDirectory: en Windows un NamedTemporaryFile abierto no se puede
+    # reabrir con pypdf. Se borra todo al salir, incluido el PDF del usuario.
+    with TemporaryDirectory() as carpeta:
+        pdf = Path(carpeta) / "boleta.pdf"
+        pdf.write_bytes(datos)
+        try:
+            boleta = parser_boletas.parsear(parser_boletas.extraer_lineas(pdf))
+        except Exception:
+            raise HTTPException(422, "No pudimos leer el PDF. ¿Es una boleta de EJESA?")
+    # acá ya no queda ningún archivo del usuario en disco
+    resultado = auditoria.auditar(boleta, auditoria.cargar_tablas())
+    return {"auditoria": resultado,
+            "explicacion": explicar.explicar(resultado, boleta)}
 
 
 @app.get("/api/auditoria")
