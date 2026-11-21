@@ -12,7 +12,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
+      - name: Dependencia local del parser (pypdf)
+        run: python -m pip install pypdf
       - name: Calculadora tarifaria (categorias, bloques, topes, RE, meses)
         run: python pruebas/test_tarifas.py
       - name: Verificador del Decreto 5658 (plazos 20/60, punitorios, vigencia)
         run: python pruebas/test_decreto.py
+      - name: Parser de boletas con texto SINTETICO (nunca datos reales)
+        run: python pruebas/test_parser.py

@@ -33,7 +33,21 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   comparación sin/con subsidios) y verificador de cortes/medidor/punitorios
   con badges y citas normativas. Identidad: ámbar eléctrico sobre carbón,
   Space Grotesk, números tabulares. Routing por hash (#panel).
+- **Fase 1 (EN CURSO)**: parser de boletas reales (`src/parser_boletas.py`,
+  pypdf local). Extrae SOLO campos de facturación (consumo, cargos, precios
+  unitarios, bonificaciones, impuestos, agua, fechas, categoría T1TS, flags de
+  punitorios) a JSON en `boletas_reales/_parseado/` (gitignoreado).
+  Inspección segura con `src/inspeccionar_boletas.py`: guarda el texto crudo
+  solo en `boletas_reales/_texto/` y muestra por consola únicamente líneas de
+  palabras clave con números enmascarados. Tests con texto SINTÉTICO
+  (`pruebas/test_parser.py`): nunca se commitean boletas ni sus textos.
+  Validado en 5 boletas reales (2025-10 a 2026-08): 100% de campos clave
+  extraídos, consistencia aritmética verificada.
+- **Pendiente de la fase 1**: cargar los cuadros tarifarios históricos (Res.
+  105/227/297/2026 y resoluciones 2025) — las boletas son de otros trimestres
+  y contra el cuadro de ago-2026 todas las comparaciones difieren (esperado).
 - Tests: `py -3.13 pruebas/test_tarifas.py` y `pruebas/test_decreto.py`.
+  `venv\Scripts\python.exe pruebas\test_parser.py`.
 
 ![Landing: tu boleta de luz, sin letra chica](docs/captura-landing.png)
 ![Panel simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
@@ -65,7 +79,9 @@ venv\Scripts\python.exe src\api.py               # http://127.0.0.1:8101
 ```
 datos/tarifas/res297_2026-08.json   cuadro oficial estructurado (fuente BO Nº 106)
 src/tarifas.py                      calculadora: categoría, componentes, bonificaciones
-src/decreto.py                      verificador de plazos del Decreto 5658-JG/2026
+src/inspeccionar_boletas.py   inspección segura (consola enmascarada, texto crudo local)
+src/parser_boletas.py         parser PDF → JSON SOLO con campos tarifarios
+pruebas/test_parser.py        tests con texto sintético (nunca boletas reales)
 src/api.py                          FastAPI: /api/cuadro /api/calcular /api/verificar/*
 web/index.html                      UI: simulador + verificador (2 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano
