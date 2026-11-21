@@ -1,4 +1,4 @@
-fastapi>=0.115
-python-multipart>=0.0.20    # subida de PDF desde el panel (procesamiento local)
-uvicorn>=0.30
-pypdf>=5.0		# parser de PDFs de boletas (procesamiento local)
+fastapi==0.165.0
+python-multipart==0.0.34
+uvicorn==0.54.0
+pypdf==7.1.1

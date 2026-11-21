@@ -77,6 +77,30 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ![Panel auditoría: 5 boletas comparadas con cuadros oficiales](docs/captura-auditoria.png)
 ![Explicación llana de una boleta cargada desde el panel](docs/captura-explicacion.png)
 
+## Despliegue público (para que otras personas auditen sus boletas)
+
+```bash
+docker build -t boleta-justa .
+docker run --rm -p 8101:8101 -e MODO_PUBLICO=1 boleta-justa
+```
+
+En modo público:
+- se ocultan los 5 ejemplos del dueño y se desactiva `GET /api/auditoria`;
+- el aviso de privacidad dice la verdad: **el PDF se envía al servidor**, se procesa
+  y se borra sin guardarse ni compartirse (en local el aviso dice lo contrario);
+- rate limit de 20 PDFs por minuto por IP y tope de 40 páginas;
+- `$PORT` y `0.0.0.0` para plataformas (Render, Fly, Railway, etc.);
+- `/api/health` para healthcheck; dependencias pineadas en `requirements.txt`.
+
+Variables: `MODO_PUBLICO=1`, `PORT`, `MAX_PAGINAS_BOLETA`, `RATE_MAX`, `RATE_VENTANA`.
+El `Dockerfile` **no copia** `boletas_reales/` (`.dockerignore`).
+
+Antes de publicar: terminar TLS/HTTPS en el proxy, recordar que el rate limit es
+en memoria por proceso (usar el del proxy si hay varios workers) y que la IP se
+toma de `X-Forwarded-For`: si se expone sin proxy, limitar en el propio proxy.
+Actualizar los cuadros tarifarios cada trimestre. Si querés privacidad estricta sin servidor,
+la alternativa es parsear el PDF en el navegador (pdf.js/Pyodide).
+
 ## Fases
 
 - **Fase 1 (MVP)**: parser de boletas PDF (pdfplumber/PyMuPDF) + capa de

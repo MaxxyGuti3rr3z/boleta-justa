@@ -24,3 +24,5 @@ jobs:
         run: python pruebas/test_auditoria.py
       - name: Explicacion en lenguaje llano (sin datos personales)
         run: python pruebas/test_explicar.py
+      - name: Modo deploy publico (consentimiento y rate limit)
+        run: python pruebas/test_deploy.py

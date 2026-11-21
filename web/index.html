@@ -422,8 +422,7 @@ table.desglose .total td:last-child{color:var(--acento)}
         <div class="card" style="grid-column:1/-1">
           <span class="dec-tag">Auditoría local</span>
           <h2>Tu boleta, explicada con palabras simples</h2>
-          <p class="card-sub">Elegí el PDF de tu boleta de EJESA. Lo analizamos acá nomás, en tu
-            computadora: no se sube a ningún servidor, no se guarda y nunca mostramos tus datos personales.</p>
+          <p class="card-sub" id="consentimiento">Elegí el PDF de tu boleta de EJESA. Lo analizamos acá nomás, en tu computadora: no se sube a ningún servidor, no se guarda y nunca mostramos tus datos personales.</p>
           <div class="subir-fila">
             <label class="btn-primary" for="pdf-input" style="cursor:pointer">Elegir mi boleta (PDF)</label>
             <input type="file" id="pdf-input" accept="application/pdf,.pdf" hidden>
@@ -433,8 +432,8 @@ table.desglose .total td:last-child{color:var(--acento)}
         </div>
       </div>
       <div id="aud-explicacion"></div>
-      <h3 class="seccion-titulo">Ejemplos ya auditados</h3>
-      <div id="aud-lista"></div>
+      <h3 class="seccion-titulo ejemplo-local">Ejemplos ya auditados</h3>
+      <div id="aud-lista" class="ejemplo-local"></div>
     </section>
   </main>
 
@@ -535,6 +534,14 @@ document.querySelectorAll('[data-verif]').forEach(b => b.onclick = async () => {
   pintar(el, d);
 });
 
+/* ---------- modo deploy: texto de consentimiento y ejemplos ---------- */
+let cfgPublico = false;
+fetch('/api/config').then(r => r.json()).then(c => {
+  cfgPublico = !!c.modo_publico;
+  $('consentimiento').textContent = c.consentimiento;
+  if (cfgPublico) document.querySelectorAll('.ejemplo-local').forEach(el => el.classList.add('oculta'));
+}).catch(() => {});
+
 /* ---------- subir una boleta y explicarla con palabras simples ---------- */
 const pdfInput = $('pdf-input');
 const btnAnalizar = $('btn-analizar');
@@ -568,8 +575,10 @@ function pintarExplicacion(x) {
     `<div><b>${i.titulo}</b><p>${i.texto}</p></div></div>`).join('');
   const acciones = x.acciones.map(a => `<li>${a}</li>`).join('');
   const glosario = x.glosario.map(g => `<div><b>${g.termino}:</b> ${g.significado}</div>`).join('');
+  const avisoServidor = cfgPublico
+    ? '<p class="expl-resumen">Procesado en el servidor sin guardar ni compartir tus datos.</p>' : '';
   $('aud-explicacion').innerHTML = `<div class="expl-card ${x.estado}">
-    <h2>${x.titulo}</h2><p class="expl-resumen">${x.resumen}</p>
+    <h2>${x.titulo}</h2>${avisoServidor}<p class="expl-resumen">${x.resumen}</p>
     ${items}
     <div class="expl-acciones"><b>Qué podés hacer</b><ul>${acciones}</ul></div>
     <details class="expl-glosario"><summary>Ver glosario (palabras raras)</summary>${glosario}</details>

@@ -6,26 +6,40 @@ Uso:  python src/api.py  → http://127.0.0.1:8101
 from tempfile import TemporaryDirectory
 
 import json
+import os
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from pypdf import PdfReader
 
 try:
-    from . import tarifas, decreto, auditoria, parser_boletas, explicar
+    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
     import auditoria
     import parser_boletas
     import explicar
+    import config
 
 RAIZ = Path(__file__).resolve().parent.parent
 
 app = FastAPI(title="Boleta Justa", version="0.2.0")
 CUADRO = tarifas.cargar()
+
+
+@app.get("/api/config")
+def ver_config():
+    return {"modo_publico": config.PUBLICO, "max_paginas": config.MAX_PAGINAS,
+            "consentimiento": config.consentimiento()}
+
+
+@app.get("/api/health")
+def salud():
+    return {"ok": True, "modo": "publico" if config.PUBLICO else "local"}
 
 
 class CalculoIn(BaseModel):
@@ -104,9 +118,16 @@ def verificar_punitorios(p: PunitoriosIn):
 
 
 @app.post("/api/auditar")
-async def auditar_pdf(file: UploadFile = File(...)):
+async def auditar_pdf(request: Request, file: UploadFile = File(...)):
     """Recibe un PDF de boleta, lo analiza en memoria local y devuelve SOLO
     la explicación en lenguaje llano. No guarda el archivo ni datos personales."""
+    # Detrás de un proxy, X-Forwarded-For identifica a cada persona; si no hay
+    # proxy, el platform igual suele setearlo. Si se expone directo, se puede
+    # falsear: en ese caso limitar en el reverse proxy.
+    ip = (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+          or (request.client.host if request.client else "desconocida"))
+    if config.PUBLICO and not config.limitador.permite(ip):
+        raise HTTPException(429, "Demasiadas boletas seguidas. Esperá un minuto.")
     nombre = (file.filename or "").lower()
     if not nombre.endswith(".pdf"):
         raise HTTPException(415, "Solo se aceptan archivos PDF")
@@ -119,7 +140,12 @@ async def auditar_pdf(file: UploadFile = File(...)):
         pdf = Path(carpeta) / "boleta.pdf"
         pdf.write_bytes(datos)
         try:
+            paginas = len(PdfReader(str(pdf)).pages)
+            if paginas > config.MAX_PAGINAS:
+                raise HTTPException(413, "El PDF tiene demasiadas páginas")
             boleta = parser_boletas.parsear(parser_boletas.extraer_lineas(pdf))
+        except HTTPException:
+            raise
         except Exception:
             raise HTTPException(422, "No pudimos leer el PDF. ¿Es una boleta de EJESA?")
     # acá ya no queda ningún archivo del usuario en disco
@@ -131,7 +157,10 @@ async def auditar_pdf(file: UploadFile = File(...)):
 @app.get("/api/auditoria")
 def ver_auditoria():
     """Auditoría de las boletas parseadas localmente. SOLO campos tarifarios:
-    nunca devuelve nombres, direcciones, DNI ni números de cuenta/factura."""
+    nunca devuelve nombres, direcciones, DNI ni números de cuenta/factura.
+    En modo público se desactiva: son las boletas del dueño del proyecto."""
+    if config.PUBLICO:
+        raise HTTPException(404, "No disponible en la versión pública")
     carpeta = RAIZ / "boletas_reales" / "_parseado"
     archivos = sorted(carpeta.glob("boleta_*.json")) if carpeta.exists() else []
     tablas = auditoria.cargar_tablas()
@@ -145,4 +174,4 @@ app.mount("/", StaticFiles(directory=RAIZ / "web", html=True), name="web")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8101)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8101")))

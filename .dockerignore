@@ -1,0 +1,13 @@
+.git
+.gitignore
+venv/
+__pycache__/
+*.pyc
+boletas_reales/
+pruebas/
+docs/
+*.pdf
+*.PDF
+*.png
+*.jpg
+*.md
