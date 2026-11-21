@@ -77,6 +77,20 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ![Panel auditoría: 5 boletas comparadas con cuadros oficiales](docs/captura-auditoria.png)
 ![Explicación llana de una boleta cargada desde el panel](docs/captura-explicacion.png)
 
+## Limpieza de datos sensibles
+
+```bash
+python scripts/limpiar_sensibles.py                       # dry-run: solo muestra
+python scripts/limpiar_sensibles.py --apply               # borra derivados
+python scripts/limpiar_sensibles.py --apply --include-originals  # borra TODO
+```
+
+Por defecto **no borra nada** y nunca toca los PDF originales: para eso hace
+falta `--include-originals` explícitamente. Los derivados (`_texto/`,
+`_parseado/`) se regeneran con `parser_boletas.py` y `auditoria.py`. El script
+también chequea que no haya archivos sensibles trackeados por git (las capturas
+de `docs/` son de la UI y no cuentan).
+
 ## Despliegue público (para que otras personas auditen sus boletas)
 
 ```bash
@@ -132,8 +146,11 @@ src/parser_boletas.py         parser PDF → JSON SOLO con campos tarifarios
 pruebas/test_parser.py        tests con texto sintético (nunca boletas reales)
 src/auditoria.py              selección de cuadro por VAD + comparación
 src/explicar.py               resultado en lenguaje llano (frases, acciones, glosario)
+scripts/limpiar_sensibles.py  borrado controlado de derivados y originales (dry-run default)
 pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
 pruebas/test_explicar.py      tests de redacción y privacidad
+pruebas/test_deploy.py        tests de modo público y rate limit
+pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano

@@ -26,3 +26,5 @@ jobs:
         run: python pruebas/test_explicar.py
       - name: Modo deploy publico (consentimiento y rate limit)
         run: python pruebas/test_deploy.py
+      - name: Limpieza de datos sensibles (dry-run / apply / total)
+        run: python pruebas/test_limpieza.py
