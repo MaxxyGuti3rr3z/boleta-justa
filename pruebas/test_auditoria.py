@@ -57,6 +57,12 @@ def main():
     b6 = {**b, "energia": {}}
     check(au.auditar(b6, tablas)["estado"] == "sin_cuadro_cargado", "sin datos VAD")
 
+    # punitorios: solo señal dentro de la vigencia del Decreto 5658 (desde 20/07/2026)
+    b7 = {**b, "fecha_emision": "05/08/2026", "punitorios_detectados": True}
+    check(au.auditar(b7, tablas)["punitorios_en_vigencia"], "punitorios dentro de vigencia")
+    b8 = {**b, "fecha_emision": "05/02/2026", "punitorios_detectados": True}
+    check(not au.auditar(b8, tablas)["punitorios_en_vigencia"], "punitorios fuera de vigencia")
+
     if fallos:
         print(f"FALLOS ({len(fallos)}):")
         for f in fallos:

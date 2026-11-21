@@ -7,7 +7,13 @@ boletas_reales/_parseado/auditoria.json (gitignoreado).
 Uso: venv\Scripts\python.exe src\auditoria.py
 """
 import json
+from datetime import date
 from pathlib import Path
+
+try:
+    from . import decreto
+except ImportError:  # ejecución directa: python src/auditoria.py
+    import decreto
 
 RAIZ = Path(__file__).resolve().parent.parent
 TABLAS_DIR = RAIZ / "datos" / "tarifas"
@@ -17,6 +23,14 @@ PARSEADAS = RAIZ / "boletas_reales" / "_parseado"
 def cargar_tablas() -> list[dict]:
     return [json.loads(p.read_text(encoding="utf-8"))
             for p in sorted(TABLAS_DIR.glob("*.json"))]
+
+
+def fecha_emision(boleta: dict) -> date | None:
+    try:
+        d, m, y = map(int, (boleta.get("fecha_emision") or "").split("/"))
+        return date(y, m, d)
+    except (ValueError, TypeError):
+        return None
 
 
 def mes_de(fecha: str | None) -> str | None:
@@ -97,6 +111,10 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
         diff_energia = round(100 * (e["precio_consumo"] - cat["energia_plena_kwh"]) /
                              cat["energia_plena_kwh"], 1)
 
+    f = fecha_emision(boleta)
+    senal = bool(boleta.get("punitorios_detectados", False))
+    en_vigencia = bool(senal and f and decreto.VIGENCIA_DESDE <= f <= decreto.VIGENCIA_HASTA)
+
     return {
         **base,
         "estado": "auditada",
@@ -108,7 +126,8 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
         "energia_ok": cat_energia is not None,
         "energia_diff_pct": diff_energia if not cat_energia else 0.0,
         "nota": tabla.get("nota_pass_through", ""),
-        "punitorios_signal": boleta.get("punitorios_detectados", False),
+        "punitorios_signal": senal,
+        "punitorios_en_vigencia": en_vigencia,
     }
 
 
@@ -137,7 +156,7 @@ def main() -> None:
               f"fijo={'OK' if r['cargo_fijo_ok'] else 'DIFIERE'} "
               f"red={'OK' if r['uso_red_ok'] else 'DIFIERE'} "
               f"energía={energia_txt} "
-              f"· punitorios={'SEÑAL' if r['punitorios_signal'] else 'no'}{aviso}")
+              f"· punitorios={'SEÑAL-VIGENTE' if r['punitorios_en_vigencia'] else ('SEÑAL-fuera-vigencia' if r['punitorios_signal'] else 'no')}{aviso}")
     (PARSEADAS / "auditoria.json").write_text(
         json.dumps(resultados, ensure_ascii=False, indent=1), encoding="utf-8")
     print("\nInforme local (sin datos personales): boletas_reales/_parseado/auditoria.json")

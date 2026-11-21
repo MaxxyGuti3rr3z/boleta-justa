@@ -46,6 +46,10 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   confianza, chips OK/DIFIERE, notas de pass through y señales de punitorios.
   Endpoint `GET /api/auditoria` devuelve SOLO campos de comparación: nunca
   nombres, direcciones, DNI ni importes.
+- **Cruce punitorios/decreto**: de 4 boletas con línea de interés punitorio,
+  solo 1 (ago-2026) cae dentro de la vigencia del Decreto 5658 (desde el
+  20/07/2026, Art. 3.C); las otras 3 son anteriores y NO se reclaman por esa
+  norma. La UI lo distingue con "SEÑAL-VIGENTE" / "SEÑAL-fuera-vigencia".
   Inspección segura con `src/inspeccionar_boletas.py`: guarda el texto crudo
   solo en `boletas_reales/_texto/` y muestra por consola únicamente líneas de
   palabras clave con números enmascarados. Tests con texto SINTÉTICO

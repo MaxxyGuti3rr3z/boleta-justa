@@ -536,7 +536,9 @@ function cargarAuditoria() {
         ${!r.uso_red_ok ? '<div class="dec-dias">Uso de red: revisar si la boleta ya aplicó la bonificación de tarifa social (25% / 15% por bloques) sobre el precio pleno.</div>' : ''}
         ${diff}${aviso}
         <div class="dec-dias">Desvío VAD ${r.score_vad_pct}% · ` +
-        `${r.punitorios_signal ? '⚠ SEÑAL de punitorios: verificar con fechas del decreto' :
+        `${r.punitorios_signal ? (r.punitorios_en_vigencia ?
+          '⚠ SEÑAL de punitorios DENTRO de la vigencia del Decreto 5658 (Art. 3.C): verificar' :
+          'SEÑAL de punitorios en fecha anterior al Decreto 5658: no reclamar por esa norma') :
           'sin señal de punitorios'}</div>
         <div class="fuente-linea">Sin importes ni datos personales: solo comparación con actos públicos.</div>
       </div>`;
