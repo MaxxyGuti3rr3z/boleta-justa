@@ -34,14 +34,18 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   con badges y citas normativas. Identidad: ámbar eléctrico sobre carbón,
   Space Grotesk, números tabulares. Routing por hash (#panel).
 - **Fase 1 (EN CURSO)**: parser de boletas reales (`src/parser_boletas.py`,
-  pypdf local) + auditoría (`src/auditoria.py`) contra 5 cuadros históricos
-  oficiales cargados en `datos/tarifas/` (Res. 296/2025, 420/2025, 81/2026,
-  227/2026, 297/2026). El cuadro se identifica por coincidencia de los
+  pypdf local) + auditoría (`src/auditoria.py`) contra 6 cuadros históricos
+  oficiales cargados en `datos/tarifas/` (Res. 168/2025, 296/2025, 420/2025,
+  81/2026, 227/2026, 297/2026). El cuadro se identifica por coincidencia de los
   componentes VAD (cargo fijo + uso de red, estables en el trimestre), NO por
-  fecha de emisión: 4 de 5 boletas calzaron con confianza alta y coincidencia
+  fecha de emisión: las 5 boletas calzaron con confianza alta y coincidencia
   exacta de VAD; la energía difiere 2-4% dentro del trimestre por pass
-  through nacional (esperado). 1 boleta (ago-2025) sigue con confianza baja:
-  requiere el cuadro anterior (Res. 248/2025).
+  through nacional (esperado). La firma de uso de red en dos boletas sugiere
+  bonificación TS aplicada en el renglón (a verificar con la línea de bonificación).
+- **Panel con pestaña "Auditoría"**: 5 tarjetas con resolución elegida,
+  confianza, chips OK/DIFIERE, notas de pass through y señales de punitorios.
+  Endpoint `GET /api/auditoria` devuelve SOLO campos de comparación: nunca
+  nombres, direcciones, DNI ni importes.
   Inspección segura con `src/inspeccionar_boletas.py`: guarda el texto crudo
   solo en `boletas_reales/_texto/` y muestra por consola únicamente líneas de
   palabras clave con números enmascarados. Tests con texto SINTÉTICO
@@ -57,6 +61,7 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 ![Landing: tu boleta de luz, sin letra chica](docs/captura-landing.png)
 ![Panel simulador: desglose de 200 kWh con tarifa social + SEF](docs/captura-simulador.png)
 ![Panel verificador: corte anticipado y punitorios prohibidos](docs/captura-verificador.png)
+![Panel auditoría: 5 boletas comparadas con cuadros oficiales](docs/captura-auditoria.png)
 
 ## Fases
 
@@ -87,8 +92,10 @@ src/tarifas.py                      calculadora: categoría, componentes, bonifi
 src/inspeccionar_boletas.py   inspección segura (consola enmascarada, texto crudo local)
 src/parser_boletas.py         parser PDF → JSON SOLO con campos tarifarios
 pruebas/test_parser.py        tests con texto sintético (nunca boletas reales)
-src/api.py                          FastAPI: /api/cuadro /api/calcular /api/verificar/*
-web/index.html                      UI: simulador + verificador (2 pestañas)
+src/auditoria.py              selección de cuadro por VAD + comparación
+pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
+src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria
+web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano
 pruebas/test_decreto.py             tests de plazos (19/20/21, 59/60, punitorios)
 docs/marco-normativo.md             marco legal completo con fuentes y pendientes

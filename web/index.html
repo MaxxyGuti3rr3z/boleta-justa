@@ -184,6 +184,13 @@ table.desglose .total td:last-child{color:var(--acento)}
 .dec-dias{font-size:.8rem;color:var(--suave);margin-top:8px}
 .normativa{margin-top:12px;font-family:var(--mono);font-size:.68rem;color:var(--apagado);
   border-left:2px solid var(--borde);padding-left:10px;line-height:1.6}
+.aud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.aud-card h3{font-size:1rem;margin-bottom:2px}
+.aud-card .fila-check{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:.78rem}
+.chip-ok{color:var(--verde);font-weight:700}.chip-diff{color:var(--rojo);font-weight:700}
+.badge.confianza-alta{background:var(--verde-fondo);color:var(--verde);border:1px solid rgba(52,211,153,.45)}
+.badge.confianza-media{background:var(--gris-fondo);color:var(--gris-zona);border:1px solid rgba(251,191,36,.45)}
+.badge.confianza-baja{background:var(--rojo-fondo);color:var(--rojo);border:1px solid rgba(248,113,113,.45)}
 .p-footer{border-top:1px solid var(--borde);padding:14px 24px;font-size:.7rem;
   color:var(--apagado);background:var(--superficie);line-height:1.6}
 .p-footer a{color:var(--suave)}
@@ -321,6 +328,7 @@ table.desglose .total td:last-child{color:var(--acento)}
     <div class="segmentado" role="tablist">
       <button id="tab-sim" class="activa" role="tab">Simulador</button>
       <button id="tab-dec" role="tab">Verificador</button>
+      <button id="tab-aud" role="tab">Auditoría</button>
     </div>
     <span class="cuadro-badge" id="cuadro-badge"></span>
   </nav>
@@ -386,6 +394,18 @@ table.desglose .total td:last-child{color:var(--acento)}
         </div>
       </div>
     </section>
+
+    <section id="sec-aud" class="oculta">
+      <div class="dec-grid" style="margin-bottom:14px">
+        <div class="card" style="grid-column:1/-1">
+          <span class="dec-tag">Auditoría local</span>
+          <h2>Tus boletas contra el cuadro oficial de su trimestre</h2>
+          <p class="card-sub">Se identifica el cuadro por cargo fijo + uso de red (VAD), que no cambian
+            dentro del trimestre. La energía puede diferir por pass through nacional: eso NO es un error.</p>
+        </div>
+      </div>
+      <div id="aud-lista"></div>
+    </section>
   </main>
 
   <footer class="p-footer" id="panel-footer">
@@ -407,10 +427,16 @@ document.querySelectorAll('[data-ir-landing]').forEach(b => b.onclick = irLandin
 if (location.hash === '#panel') irPanel();
 
 /* ---------- tabs del panel ---------- */
-$('tab-sim').onclick = () => { $('sec-sim').classList.remove('oculta'); $('sec-dec').classList.add('oculta');
-  $('tab-sim').classList.add('activa'); $('tab-dec').classList.remove('activa'); };
-$('tab-dec').onclick = () => { $('sec-dec').classList.remove('oculta'); $('sec-sim').classList.add('oculta');
-  $('tab-dec').classList.add('activa'); $('tab-sim').classList.remove('activa'); };
+function cambiarTab(nombre) {
+  ['sim','dec','aud'].forEach(n => {
+    $('sec-' + n).classList.toggle('oculta', n !== nombre);
+    $('tab-' + n).classList.toggle('activa', n === nombre);
+  });
+  if (nombre === 'aud') cargarAuditoria();
+}
+$('tab-sim').onclick = () => cambiarTab('sim');
+$('tab-dec').onclick = () => cambiarTab('dec');
+$('tab-aud').onclick = () => cambiarTab('aud');
 
 /* ---------- cuadro vigente ---------- */
 fetch('/api/cuadro').then(r=>r.json()).then(c=>{
@@ -478,6 +504,45 @@ document.querySelectorAll('[data-verif]').forEach(b => b.onclick = async () => {
   if (!r.ok) { el.innerHTML = `<div class="error">⚠ ${d.detail || 'error'}</div>`; return; }
   pintar(el, d);
 });
+
+/* ---------- auditoría local (solo datos tarifarios, sin datos personales) ---------- */
+function cargarAuditoria() {
+  const el = $('aud-lista');
+  el.innerHTML = '<div class="vacio">Leyendo el resultado de la auditoría local…</div>';
+  fetch('/api/auditoria').then(r => r.json()).then(rs => {
+    if (!rs.length) {
+      el.innerHTML = '<div class="vacio">No hay boletas parseadas aún.<br>' +
+        'Corré <span class="num">venv\\Scripts\\python.exe src\\parser_boletas.py</span> ' +
+        'para auditar tus boletas (procesamiento 100% local).</div>';
+      return;
+    }
+    el.innerHTML = '<div class="aud-grid">' + rs.map(r => {
+      if (r.estado !== 'auditada') {
+        return `<div class="card aud-card"><h3>Boleta ${r.boleta}</h3>
+          <div class="dec-dias">${r.mes || 'sin fecha'} · sin cuadro cargado para ese período</div></div>`;
+      }
+      const chk = (ok, nombre) => `<span class="${ok ? 'chip-ok' : 'chip-diff'}">` +
+        `${ok ? 'OK' : 'DIFIERE'} ${nombre}</span>`;
+      const aviso = r.resolucion_por_fecha && r.resolucion_por_fecha !== r.resolucion
+        ? `<div class="dec-dias">Por fecha de emisión sería ${r.resolucion_por_fecha}: revisar período facturado.</div>` : '';
+      const diff = !r.energia_ok && r.energia_diff_pct
+        ? `<div class="dec-dias">Energía ${r.energia_diff_pct > 0 ? '+' : ''}${r.energia_diff_pct}% ` +
+          `respecto del cuadro (pass through nacional: esperado).</div>` : '';
+      return `<div class="card aud-card">
+        <h3>Boleta ${r.boleta} <span class="badge confianza-${r.confianza}">confianza ${r.confianza}</span></h3>
+        <div class="dec-dias num">${r.mes || '—'} · ${r.resolucion} · categoría ${r.categoria_tabla || '?'}</div>
+        <div class="fila-check">${chk(r.cargo_fijo_ok, 'cargo fijo')}${chk(r.uso_red_ok, 'uso de red')}` +
+        `${chk(r.energia_ok, 'energía')}</div>
+        ${!r.uso_red_ok ? '<div class="dec-dias">Uso de red: revisar si la boleta ya aplicó la bonificación de tarifa social (25% / 15% por bloques) sobre el precio pleno.</div>' : ''}
+        ${diff}${aviso}
+        <div class="dec-dias">Desvío VAD ${r.score_vad_pct}% · ` +
+        `${r.punitorios_signal ? '⚠ SEÑAL de punitorios: verificar con fechas del decreto' :
+          'sin señal de punitorios'}</div>
+        <div class="fuente-linea">Sin importes ni datos personales: solo comparación con actos públicos.</div>
+      </div>`;
+    }).join('') + '</div>';
+  }).catch(() => { el.innerHTML = '<div class="error">No se pudo leer la auditoría local.</div>'; });
+}
 </script>
 </body>
 </html>

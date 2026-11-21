@@ -3,6 +3,7 @@
 Uso:  python src/api.py  → http://127.0.0.1:8101
 (venv: venv\Scripts\python.exe src\api.py)
 """
+import json
 from datetime import date
 from pathlib import Path
 
@@ -11,10 +12,11 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 try:
-    from . import tarifas, decreto
+    from . import tarifas, decreto, auditoria
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
+    import auditoria
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -95,6 +97,19 @@ def verificar_punitorios(p: PunitoriosIn):
         return decreto.verificar_punitorios(p.monto_punitorios, p.fecha_factura)
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+@app.get("/api/auditoria")
+def ver_auditoria():
+    """Auditoría de las boletas parseadas localmente. SOLO campos tarifarios:
+    nunca devuelve nombres, direcciones, DNI ni números de cuenta/factura."""
+    carpeta = RAIZ / "boletas_reales" / "_parseado"
+    archivos = sorted(carpeta.glob("boleta_*.json")) if carpeta.exists() else []
+    tablas = auditoria.cargar_tablas()
+    return [
+        {"boleta": i, **auditoria.auditar(json.loads(p.read_text(encoding="utf-8")), tablas)}
+        for i, p in enumerate(archivos, 1)
+    ]
 
 
 app.mount("/", StaticFiles(directory=RAIZ / "web", html=True), name="web")

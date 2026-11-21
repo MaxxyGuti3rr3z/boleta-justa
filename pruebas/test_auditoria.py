@@ -49,8 +49,8 @@ def main():
     check(r4["resolucion"] == "420-SUSEPU/2025", "res nov")
     check(r4["cargo_fijo_ok"] and r4["uso_red_ok"] and r4["energia_ok"], "nov coincide")
 
-    # may-2025: no hay cuadro por fecha (pero el VAD igual permite identificar uno)
-    b5 = {**b, "fecha_emision": "05/05/2025"}
+    # mar-2025: no hay cuadro por fecha (pero el VAD igual permite identificar uno)
+    b5 = {**b, "fecha_emision": "05/03/2025"}
     r5 = au.auditar(b5, tablas)
     check(r5["resolucion_por_fecha"] is None, "mes sin cuadro por fecha")
     check(r5["estado"] == "auditada", "selección por VAD funciona sin fecha")
