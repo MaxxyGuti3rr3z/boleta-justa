@@ -531,9 +531,10 @@ function cargarAuditoria() {
       return `<div class="card aud-card">
         <h3>Boleta ${r.boleta} <span class="badge confianza-${r.confianza}">confianza ${r.confianza}</span></h3>
         <div class="dec-dias num">${r.mes || '—'} · ${r.resolucion} · categoría ${r.categoria_tabla || '?'}</div>
-        <div class="fila-check">${chk(r.cargo_fijo_ok, 'cargo fijo')}${chk(r.uso_red_ok, 'uso de red')}` +
+        <div class="fila-check">${chk(r.cargo_fijo_ok, 'cargo fijo')}${chk(r.uso_red_ok, r.uso_red_metodo === 'bloques' ? 'uso de red (bloques)' : 'uso de red')}` +
         `${chk(r.energia_ok, 'energía')}</div>
-        ${!r.uso_red_ok ? '<div class="dec-dias">Uso de red: revisar si la boleta ya aplicó la bonificación de tarifa social (25% / 15% por bloques) sobre el precio pleno.</div>' : ''}
+        ${r.uso_red_metodo === 'bloques' ? '<div class="dec-dias">Uso de red: precio ponderado por bloques de consumo (coincide con el cuadro); la bonificación TS figura en su propio renglón.</div>' : ''}
+        ${!r.uso_red_ok ? '<div class="dec-dias">Uso de red: comparar con el cuadro vigente.</div>' : ''}
         ${diff}${aviso}
         <div class="dec-dias">Desvío VAD ${r.score_vad_pct}% · ` +
         `${r.punitorios_signal ? (r.punitorios_en_vigencia ?

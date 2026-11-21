@@ -63,12 +63,22 @@ def main():
     b8 = {**b, "fecha_emision": "05/02/2026", "punitorios_detectados": True}
     check(not au.auditar(b8, tablas)["punitorios_en_vigencia"], "punitorios fuera de vigencia")
 
+    # uso de red por bloques: el precio impreso es promedio ponderado, no una categoria
+    cats227 = next(t for t in tablas if t["resolucion"].startswith("227"))["t1_residencial"]["categorias"]
+    esperado = au.precio_red_por_bloques(cats227, 189.5)
+    b9 = {**b, "energia": {"cargo_fijo": 4772.0, "cargo_consumo": 189.5 * 141.0,
+                           "precio_red": esperado, "precio_consumo": 141.0,
+                           "bonif_tarifa_social": -100.0}}
+    r9 = au.auditar(b9, tablas)
+    check(r9["uso_red_ok"] and r9["uso_red_metodo"] == "bloques", "uso de red por bloques")
+    check(r9["bonif_ts_presente"], "bonificacion TS en renglon aparte")
+
     if fallos:
         print(f"FALLOS ({len(fallos)}):")
         for f in fallos:
             print(" -", f)
         sys.exit(1)
-    print("OK: 4 cuadros, selección por mes, VAD exacto, pass through julio, mes sin cuadro")
+    print("OK: 6 cuadros, selección por mes, VAD exacto, pass through julio, mes sin cuadro, bloques de red")
 
 
 if __name__ == "__main__":

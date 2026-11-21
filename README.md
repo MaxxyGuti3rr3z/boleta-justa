@@ -40,8 +40,12 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   componentes VAD (cargo fijo + uso de red, estables en el trimestre), NO por
   fecha de emisión: las 5 boletas calzaron con confianza alta y coincidencia
   exacta de VAD; la energía difiere 2-4% dentro del trimestre por pass
-  through nacional (esperado). La firma de uso de red en dos boletas sugiere
-  bonificación TS aplicada en el renglón (a verificar con la línea de bonificación).
+  through nacional (esperado). Uso de red resuelto: el precio impreso es el
+  promedio ponderado por bloques de consumo (R1 0-150 kWh, R2 150-250,
+  R2-bis 250-350...), NO el precio de una sola categoría. Verificado en 5/5
+  con aritmética exacta p. ej. 150×69,2325 + 39,5×70,3651 = 13.164,30
+  (Res. 296) y 150×65,0152 + 55×66,0788 = 13.386,62 (Res. 168). La bonificación
+  TS está en el renglón propio, no descontada del precio unitario.
 - **Panel con pestaña "Auditoría"**: 5 tarjetas con resolución elegida,
   confianza, chips OK/DIFIERE, notas de pass through y señales de punitorios.
   Endpoint `GET /api/auditoria` devuelve SOLO campos de comparación: nunca

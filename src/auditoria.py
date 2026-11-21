@@ -91,6 +91,34 @@ def _cercana(cats: list[dict], clave: str, valor: float | None, tol_pct=0.3) -> 
     return None
 
 
+def kwh_de(e: dict) -> float | None:
+    consumo, precio = e.get("cargo_consumo"), e.get("precio_consumo")
+    if consumo and precio:
+        return round(consumo / precio, 3)
+    return None
+
+
+def precio_red_por_bloques(cats: list[dict], kwh: float | None) -> float | None:
+    """EJESA cobra el uso de red por bloques acumulativos (R1 0-150 kWh,
+    R2 150-250, R2-bis 250-350, R3 350-500...). El precio unitario impreso
+    en la boleta es el promedio ponderado de esos bloques a precio pleno;
+    la bonificación de tarifa social figura en un renglón aparte."""
+    if not kwh or kwh <= 0:
+        return None
+    total = 0.0
+    anterior = 0.0
+    for c in cats:
+        tope = c["hasta_kwh"]
+        superior = float(tope) if tope is not None else kwh
+        bloque = max(0.0, min(kwh, superior) - anterior)
+        if bloque:
+            total += bloque * c["uso_red_kwh"]
+            anterior = superior
+        if anterior >= kwh:
+            break
+    return round(total / kwh, 6)
+
+
 def auditar(boleta: dict, tablas: list[dict]) -> dict:
     mes = mes_de(boleta.get("fecha_emision"))
     tabla, score, confianza = seleccionar_tabla(boleta, tablas)
@@ -104,6 +132,12 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
     cat_fijo = _cercana(cats, "cargo_fijo", e.get("cargo_fijo"))
     cat_red = _cercana(cats, "uso_red_kwh", e.get("precio_red"))
     cat_energia = _cercana(cats, "energia_plena_kwh", e.get("precio_consumo"))
+    kwh = kwh_de(e)
+    red_bloques = precio_red_por_bloques(cats, kwh)
+    red_por_bloques = bool(
+        red_bloques and e.get("precio_red") and
+        abs(e["precio_red"] - red_bloques) <= red_bloques * 0.005
+    )
 
     cat = cat_fijo or cat_red or cat_energia
     diff_energia = 0.0
@@ -122,7 +156,9 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
         "resolucion_por_fecha": tabla_fecha["resolucion"] if tabla_fecha else None,
         "categoria_tabla": cat["id"] if cat else None,
         "cargo_fijo_ok": cat_fijo is not None,
-        "uso_red_ok": cat_red is not None,
+        "uso_red_ok": cat_red is not None or red_por_bloques,
+        "uso_red_metodo": "bloques" if red_por_bloques else ("categoria" if cat_red else "no"),
+        "bonif_ts_presente": bool(e.get("bonif_tarifa_social")),
         "energia_ok": cat_energia is not None,
         "energia_diff_pct": diff_energia if not cat_energia else 0.0,
         "nota": tabla.get("nota_pass_through", ""),
