@@ -128,6 +128,22 @@ Esto es control de acceso, NO almacenamiento de boletas: la app sigue sin
 guardar PDFs ni historial por usuario. En deploy público hace falta HTTPS para
 que la cookie viaje cifrada.
 
+### Historial por usuario (opcional)
+
+Si se quiere guardar lo que se analizó, se hace con `POST /api/analisis`
+enviando el **payload validado** (el mismo JSON que se le pasaría a la IA).
+No se guarda el PDF, el texto extraído ni ningún dato de identidad: la única
+relación con la persona es su id interno. Endpoints:
+
+- `POST /api/analisis` — guarda el payload para la sesión actual.
+- `GET /api/analisis` — lista `{id, creado, mes, resolucion}` (sin payload).
+- `GET /api/analisis/{id}` — devuelve el payload completo, solo si es del usuario.
+- `DELETE /api/analisis/{id}` y `DELETE /api/analisis` — borrado puntual o total.
+
+Límites: 50 análisis por usuario (`MAX_HISTORIAL`) y 90 días de retención
+(`DIAS_RETENCION_HISTORIAL`); se poda automáticamente al guardar. Las consultas
+están aisladas por usuario: otro id no puede ver ni borrar el análisis.
+
 ## Cliente sin servidor (cero riesgo)
 
 La carpeta `cliente/` es un sitio estático que lee el PDF con pdf.js y hace
@@ -208,6 +224,7 @@ src/preguntas.py              preguntas respondidas desde los datos, sin IA
 src/payload_ia.py             JSON mínimo validado (sin datos personales) para IA opcional
 src/ia_client.py              cliente IA opcional (solo si hay API configurada)
 src/auth.py                   login opcional: scrypt, hash de email, sesiones opacas
+src/historial.py              historial por id de usuario: solo payload validado
 scripts/limpiar_sensibles.py  borrado controlado de derivados y originales (dry-run default)
 pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
 pruebas/test_explicar.py      tests de redacción y privacidad
@@ -215,6 +232,7 @@ pruebas/test_deploy.py        tests de modo público y rate limit
 pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
 pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
 pruebas/test_auth.py          tests de login (scrypt, sesiones, sin datos en claro)
+pruebas/test_historial.py     tests de historial aislado y poda/retención
 cliente/                      sitio estático: PDF leído en el navegador, cero upload
 pruebas-js/                   tests del cliente con node:test (11 tests)
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar

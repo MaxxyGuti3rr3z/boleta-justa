@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from pypdf import PdfReader
 
 try:
-    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config, payload_ia, preguntas, ia_client, auth
+    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config, payload_ia, preguntas, ia_client, auth, historial
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
@@ -29,6 +29,7 @@ except ImportError:  # ejecución directa: python src/api.py
     import preguntas
     import ia_client
     import auth
+    import historial
 
 RAIZ = Path(__file__).resolve().parent.parent
 
@@ -289,6 +290,78 @@ def yo(request: Request):
     uid = auth.usuario_por_token(request.cookies.get(COOKIE), conn)
     conn.close()
     return {"autenticado": uid is not None}
+
+
+def _uid_o_401(request: Request, conn):
+    if not config.AUTH:
+        raise HTTPException(404, "Autenticación desactivada")
+    uid = auth.usuario_por_token(request.cookies.get(COOKIE), conn)
+    if uid is None:
+        raise HTTPException(401, "Iniciá sesión para guardar o ver tu historial")
+    return uid
+
+
+class AnalisisIn(BaseModel):
+    payload: dict
+
+
+@app.post("/api/analisis")
+def guardar_analisis(request: Request, d: AnalisisIn):
+    conn = _db_auth()
+    try:
+        uid = _uid_o_401(request, conn)
+        aid = historial.guardar(conn, uid, d.payload, config.MAX_HISTORIAL)
+    finally:
+        conn.close()
+    return {"ok": True, "id": aid}
+
+
+@app.get("/api/analisis")
+def listar_analisis(request: Request):
+    conn = _db_auth()
+    try:
+        uid = _uid_o_401(request, conn)
+        items = historial.listar(conn, uid, config.MAX_HISTORIAL)
+    finally:
+        conn.close()
+    return items
+
+
+@app.get("/api/analisis/{analisis_id}")
+def ver_analisis(analisis_id: int, request: Request):
+    conn = _db_auth()
+    try:
+        uid = _uid_o_401(request, conn)
+        datos = historial.obtener(conn, uid, analisis_id)
+    finally:
+        conn.close()
+    if datos is None:
+        raise HTTPException(404, "No encontrado")
+    return datos
+
+
+@app.delete("/api/analisis/{analisis_id}")
+def borrar_analisis(analisis_id: int, request: Request):
+    conn = _db_auth()
+    try:
+        uid = _uid_o_401(request, conn)
+        borrado = historial.borrar(conn, uid, analisis_id)
+    finally:
+        conn.close()
+    if not borrado:
+        raise HTTPException(404, "No encontrado")
+    return {"ok": True}
+
+
+@app.delete("/api/analisis")
+def borrar_todo(request: Request):
+    conn = _db_auth()
+    try:
+        uid = _uid_o_401(request, conn)
+        n = historial.borrar_todos(conn, uid)
+    finally:
+        conn.close()
+    return {"ok": True, "borrados": n}
 
 
 app.mount("/", StaticFiles(directory=RAIZ / "web", html=True), name="web")

@@ -32,6 +32,15 @@ def conectar(ruta: str | Path) -> sqlite3.Connection:
         token_hash TEXT PRIMARY KEY,
         usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
         expira REAL NOT NULL)""")
+    # Historial: SOLO payloads tarifarios validados (nunca PDFs ni datos de identidad)
+    conn.execute("""CREATE TABLE IF NOT EXISTS analisis (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        usuario_id INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+        creado REAL NOT NULL,
+        mes TEXT,
+        resolucion TEXT,
+        payload TEXT NOT NULL)""")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_analisis_usuario ON analisis(usuario_id, creado DESC)")
     conn.commit()
     return conn
 

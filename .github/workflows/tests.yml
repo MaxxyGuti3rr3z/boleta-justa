@@ -32,6 +32,8 @@ jobs:
         run: python pruebas/test_preguntas.py
       - name: Auth opcional (scrypt, sin datos en claro, sesiones)
         run: python pruebas/test_auth.py
+      - name: Historial por usuario (solo payload validado, aislado)
+        run: python pruebas/test_historial.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

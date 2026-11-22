@@ -45,10 +45,11 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
 1. **Login**: implementado como opcional (`AUTH_HABILITADO=1`, `src/auth.py`).
    Claves con scrypt + salt, email guardado solo como hash, sesiones con token
    opaco (hash en DB, cookie HttpOnly/SameSite/Secure, vencimiento 24 h), límite
-   de 5 intentos por IP y cabeceras de seguridad. Sigue desactivado por defecto
-   y NO guarda boletas ni historial: es control de acceso, no storage de datos
-   sensibles. Si se quiere historial por usuario, ese es el siguiente paso y
-   debería cifrarse en el navegador.
+   de 5 intentos por IP y cabeceras de seguridad. Sigue desactivado por defecto.
+   Es control de acceso: no guarda boletas ni datos de identidad. El historial (`src/historial.py`) guarda SOLO el payload validado
+   relacionado con el id interno del usuario: nada de PDFs, emails en claro ni
+   datos de identidad, con tope de 50 por usuario y 90 días de retención.
+   Si se quiere cifrado en el navegador, ese es el siguiente paso.
 2. **Preguntas sobre la boleta**: ya resuelto con `src/payload_ia.py`: se extraen
    los datos localmente y solo viaja un JSON con campos tarifarios permitidos
    (sin nombre, dirección, DNI, CUIT ni números de cuenta). La IA es opcional
