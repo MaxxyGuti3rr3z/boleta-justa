@@ -109,6 +109,27 @@ falta `--include-originals` explícitamente. Los derivados (`_texto/`,
 también chequea que no haya archivos sensibles trackeados por git (las capturas
 de `docs/` son de la UI y no cuentan).
 
+## Cliente sin servidor (cero riesgo)
+
+La carpeta `cliente/` es un sitio estático que lee el PDF con pdf.js y hace
+TODA la auditoría en el navegador. No hay backend, no hay upload, no se guarda
+nada: el dato sensible nunca sale del dispositivo. Para probarlo:
+
+```bash
+py -3.13 scripts/generar_tablas_js.py     # tras cambiar datos/tarifas/*.json
+cd cliente && py -m http.server 8100
+# abrir http://127.0.0.1:8100
+```
+
+Para publicarlo alcanza con subir `cliente/` a GitHub Pages, Netlify o
+Cloudflare Pages (gratis). La librería pdf.js se carga desde jsDelivr; si se
+quiere funcionamiento 100% offline, se pueden bajar los dos `.mjs` a `cliente/`
+y cambiar los `import` en `app.js`.
+
+Si se actualiza un cuadro tarifario, la fuente sigue siendo
+`datos/tarifas/*.json`; el script `generar_tablas_js.py` regenera
+`cliente/tablas.js` (no editar ese archivo a mano).
+
 ## Despliegue público (para que otras personas auditen sus boletas)
 
 ```bash
@@ -173,6 +194,8 @@ pruebas/test_explicar.py      tests de redacción y privacidad
 pruebas/test_deploy.py        tests de modo público y rate limit
 pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
 pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
+cliente/                      sitio estático: PDF leído en el navegador, cero upload
+pruebas-js/                   tests del cliente con node:test (11 tests)
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano

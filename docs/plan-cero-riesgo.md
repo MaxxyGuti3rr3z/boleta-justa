@@ -54,14 +54,20 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
    pero es el límite acordado. La respuesta por defecto es determinística,
    sin modelo ni llamada externa.
 
-## Orden de trabajo sugerido
+## Estado (actualizado)
 
-1. Port de `parser_boletas.py` a JS + tests con el texto sintético actual.
-2. Port de `auditoria.py` (selección por VAD, bloques de uso de red) + tests.
-3. Port de `explicar.py` + preguntas determinísticas.
-4. Armado del sitio estático y verificación en navegador sin servidor.
-5. Publicación en hosting gratuito y baja definitiva del modo servidor.
+1. ✅ Parser a JS (`cliente/parser.js`) con tests `node:test`.
+2. ✅ Auditoría a JS (`cliente/auditoria.js`) con selección por VAD y bloques.
+3. ✅ Explicación en lenguaje llano (`cliente/explicar.js`).
+4. ✅ Sitio estático `cliente/` verificado en navegador con una boleta real:
+    fecha, resolución y explicación correctas, y **cero llamadas de red** con
+    el PDF durante el análisis (espiando fetch/XHR).
+5. ⏳ Publicación: subir `cliente/` a GitHub Pages / Netlify / Cloudflare Pages.
 
-Hasta que esas decisiones estén confirmadas, el repositorio sigue con el modo
-público actual (`MODO_PUBLICO=1`), que es seguro pero todavía recibe el PDF
-en el servidor.
+La API local sigue disponible para desarrollo; la versión pública recomendada
+es el cliente estático. Las decisiones (sin login, IA solo con payload mínimo)
+se mantienen.
+
+(El plan original era: port del parser, port de la auditoría, port de la
+explicación, sitio estático y publicación. Esos cinco pasos están hechos salvo
+la publicación.)
