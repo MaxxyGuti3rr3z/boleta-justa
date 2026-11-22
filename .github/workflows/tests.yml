@@ -30,6 +30,8 @@ jobs:
         run: python pruebas/test_limpieza.py
       - name: Payload mínimo para IA y preguntas locales (sin datos personales)
         run: python pruebas/test_preguntas.py
+      - name: Auth opcional (scrypt, sin datos en claro, sesiones)
+        run: python pruebas/test_auth.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

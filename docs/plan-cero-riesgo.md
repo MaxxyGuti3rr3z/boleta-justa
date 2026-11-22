@@ -42,10 +42,13 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
 
 ## Decisiones pendientes (a confirmar)
 
-1. **Login**: se recomienda NO agregarlo. Guardar cuentas agrega datos
-   personales y aumenta el riesgo, contrario al objetivo. Solo tendría sentido
-   para historial entre dispositivos; si se quiere, que sea opcional y con
-   datos cifrados en el propio navegador.
+1. **Login**: implementado como opcional (`AUTH_HABILITADO=1`, `src/auth.py`).
+   Claves con scrypt + salt, email guardado solo como hash, sesiones con token
+   opaco (hash en DB, cookie HttpOnly/SameSite/Secure, vencimiento 24 h), límite
+   de 5 intentos por IP y cabeceras de seguridad. Sigue desactivado por defecto
+   y NO guarda boletas ni historial: es control de acceso, no storage de datos
+   sensibles. Si se quiere historial por usuario, ese es el siguiente paso y
+   debería cifrarse en el navegador.
 2. **Preguntas sobre la boleta**: ya resuelto con `src/payload_ia.py`: se extraen
    los datos localmente y solo viaja un JSON con campos tarifarios permitidos
    (sin nombre, dirección, DNI, CUIT ni números de cuenta). La IA es opcional

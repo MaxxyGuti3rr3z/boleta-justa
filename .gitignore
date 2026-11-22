@@ -16,6 +16,11 @@ boletas_reales/
 /*.heic
 /*.webp
 
+# Base de datos de cuentas (si se habilita AUTH_HABILITADO)
+datos/auth.db
+datos/*.db
+*.db-journal
+
 # Herramientas externas
 .atl/
 .junie/

@@ -11,12 +11,13 @@ from datetime import date
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pypdf import PdfReader
 
 try:
-    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config, payload_ia, preguntas, ia_client
+    from . import tarifas, decreto, auditoria, parser_boletas, explicar, config, payload_ia, preguntas, ia_client, auth
 except ImportError:  # ejecución directa: python src/api.py
     import tarifas
     import decreto
@@ -27,10 +28,24 @@ except ImportError:  # ejecución directa: python src/api.py
     import payload_ia
     import preguntas
     import ia_client
+    import auth
 
 RAIZ = Path(__file__).resolve().parent.parent
 
 app = FastAPI(title="Boleta Justa", version="0.2.0")
+
+
+@app.middleware("http")
+async def cabeceras_seguras(request: Request, call_next):
+    respuesta = await call_next(request)
+    respuesta.headers["X-Content-Type-Options"] = "nosniff"
+    respuesta.headers["X-Frame-Options"] = "DENY"
+    respuesta.headers["Referrer-Policy"] = "no-referrer"
+    if request.url.path.startswith("/api/"):
+        respuesta.headers["Cache-Control"] = "no-store"
+    return respuesta
+
+
 CUADRO = tarifas.cargar()
 
 
@@ -199,6 +214,81 @@ def ver_auditoria():
         {"boleta": i, **auditoria.auditar(json.loads(p.read_text(encoding="utf-8")), tablas)}
         for i, p in enumerate(archivos, 1)
     ]
+
+
+# ---------- autenticación opcional (AUTH_HABILITADO=1) ----------
+class AuthIn(BaseModel):
+    email: str
+    clave: str
+
+
+login_limitador = config.Limitador(maximo=5, ventana=300)
+COOKIE = "bj_sesion"
+
+
+def _db_auth():
+    ruta = Path(config.AUTH_DB)
+    if not ruta.is_absolute():
+        ruta = RAIZ / ruta
+    return auth.conectar(ruta)
+
+
+def _ip(request: Request) -> str:
+    return (request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+            or (request.client.host if request.client else "desconocida"))
+
+
+@app.post("/api/auth/registro")
+def registro(d: AuthIn):
+    if not config.AUTH:
+        raise HTTPException(404, "Autenticación desactivada")
+    conn = _db_auth()
+    try:
+        auth.registrar(d.email, d.clave, conn)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    finally:
+        conn.close()
+    return {"ok": True}
+
+
+@app.post("/api/auth/login")
+def login(request: Request, d: AuthIn):
+    if not config.AUTH:
+        raise HTTPException(404, "Autenticación desactivada")
+    if not login_limitador.permite(_ip(request)):
+        raise HTTPException(429, "Demasiados intentos. Esperá unos minutos.")
+    conn = _db_auth()
+    uid = auth.verificar(d.email, d.clave, conn)
+    if uid is None:
+        conn.close()
+        raise HTTPException(401, "Credenciales inválidas")
+    token = auth.crear_sesion(uid, conn)
+    conn.close()
+    respuesta = JSONResponse({"ok": True})
+    respuesta.set_cookie(COOKIE, token, max_age=auth.DURACION_SESION,
+                         httponly=True, samesite="lax", secure=config.PUBLICO, path="/")
+    return respuesta
+
+
+@app.post("/api/auth/logout")
+def logout(request: Request):
+    conn = _db_auth()
+    auth.cerrar_sesion(request.cookies.get(COOKIE), conn)
+    conn.close()
+    respuesta = JSONResponse({"ok": True})
+    respuesta.delete_cookie(COOKIE, path="/")
+    return respuesta
+
+
+@app.get("/api/auth/yo")
+def yo(request: Request):
+    if not config.AUTH:
+        raise HTTPException(404, "Autenticación desactivada")
+    conn = _db_auth()
+    uid = auth.usuario_por_token(request.cookies.get(COOKIE), conn)
+    conn.close()
+    return {"autenticado": uid is not None}
 
 
 app.mount("/", StaticFiles(directory=RAIZ / "web", html=True), name="web")

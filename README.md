@@ -109,6 +109,25 @@ falta `--include-originals` explícitamente. Los derivados (`_texto/`,
 también chequea que no haya archivos sensibles trackeados por git (las capturas
 de `docs/` son de la UI y no cuentan).
 
+## Login opcional (AUTH_HABILITADO=1)
+
+Desactivado por defecto. Se habilita con `AUTH_HABILITADO=1` y un `AUTH_DB`
+(ruta a SQLite; por defecto `datos/auth.db`, gitignoreada). Endpoints:
+`/api/auth/registro`, `/api/auth/login`, `/api/auth/logout`, `/api/auth/yo`.
+
+- Claves hasheadas con **scrypt** + salt aleatorio; comparación en tiempo constante.
+- El email se guarda SOLO como hash (para buscarlo), nunca en claro.
+- Sesiones: token opaco en cookie `HttpOnly`, `SameSite=Lax` y `Secure` cuando
+  `MODO_PUBLICO=1`; en la DB se guarda solo el hash del token, con vencimiento
+  de 24 h.
+- Límite de 5 intentos de login cada 5 minutos por IP.
+- Cabeceras de seguridad en todas las respuestas: `nosniff`, `X-Frame-Options:
+  DENY`, `Referrer-Policy: no-referrer` y `Cache-Control: no-store` en `/api/*`.
+
+Esto es control de acceso, NO almacenamiento de boletas: la app sigue sin
+guardar PDFs ni historial por usuario. En deploy público hace falta HTTPS para
+que la cookie viaje cifrada.
+
 ## Cliente sin servidor (cero riesgo)
 
 La carpeta `cliente/` es un sitio estático que lee el PDF con pdf.js y hace
@@ -188,12 +207,14 @@ src/explicar.py               resultado en lenguaje llano (frases, acciones, glo
 src/preguntas.py              preguntas respondidas desde los datos, sin IA
 src/payload_ia.py             JSON mínimo validado (sin datos personales) para IA opcional
 src/ia_client.py              cliente IA opcional (solo si hay API configurada)
+src/auth.py                   login opcional: scrypt, hash de email, sesiones opacas
 scripts/limpiar_sensibles.py  borrado controlado de derivados y originales (dry-run default)
 pruebas/test_auditoria.py     tests con boletas sintéticas (nunca datos reales)
 pruebas/test_explicar.py      tests de redacción y privacidad
 pruebas/test_deploy.py        tests de modo público y rate limit
 pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
 pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
+pruebas/test_auth.py          tests de login (scrypt, sesiones, sin datos en claro)
 cliente/                      sitio estático: PDF leído en el navegador, cero upload
 pruebas-js/                   tests del cliente con node:test (11 tests)
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar

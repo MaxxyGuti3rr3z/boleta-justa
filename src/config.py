@@ -6,6 +6,8 @@ import time
 from collections import defaultdict, deque
 
 PUBLICO = os.getenv("MODO_PUBLICO", "").strip().lower() in ("1", "true", "yes")
+AUTH = os.getenv("AUTH_HABILITADO", "").strip().lower() in ("1", "true", "yes")
+AUTH_DB = os.getenv("AUTH_DB", "datos/auth.db")
 MAX_PAGINAS = int(os.getenv("MAX_PAGINAS_BOLETA", "40"))
 RATE_MAX = int(os.getenv("RATE_MAX", "20"))          # PDFs por ventana
 RATE_VENTANA = int(os.getenv("RATE_VENTANA", "60"))  # segundos
