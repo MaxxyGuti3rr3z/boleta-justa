@@ -1,0 +1,39 @@
+{
+  "id": "14_limite_350_audit",
+  "tipo": "auditar",
+  "entrada": {
+    "fecha_emision": "20/08/2026",
+    "categoria": "T1",
+    "punitorios_detectados": false,
+    "energia": {
+      "cargo_fijo": 3719,
+      "precio_red": 69.8797,
+      "cargo_red": 24457.9,
+      "precio_consumo": 112.9199,
+      "cargo_consumo": 39521.96
+    },
+    "impuestos": {},
+    "otros_cargos": {},
+    "agua": {},
+    "totales": {}
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "categoria_boleta": "T1",
+    "confianza": "alta",
+    "score_vad_pct": 0.34,
+    "estado": "auditada",
+    "resolucion": "296-SUSEPU/2025",
+    "resolucion_por_fecha": "297-SUSEPU/2026",
+    "categoria_tabla": "R1",
+    "cargo_fijo_ok": true,
+    "uso_red_ok": true,
+    "uso_red_metodo": "bloques",
+    "bonif_ts_presente": false,
+    "energia_ok": true,
+    "energia_diff_pct": 0.0,
+    "nota": "Cargo fijo y uso de red (VAD) se mantienen durante el trimestre. Los cargos por consumo de energía se actualizaron dentro del trimestre: Res. 363-SUSEPU/2025 (sep-oct, R1 113,0688 $/kWh) y Res. 384-SUSEPU/2025 (oct, Res. SE 383/2025). Valores base de la Res. 296 cargados abajo.",
+    "punitorios_signal": false,
+    "punitorios_en_vigencia": false
+  }
+}

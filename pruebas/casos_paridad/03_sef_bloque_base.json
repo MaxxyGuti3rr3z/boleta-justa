@@ -1,0 +1,25 @@
+{
+  "id": "03_sef_bloque_base",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 300,
+    "mes": "2026-08",
+    "sef": true
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "kwh": 300,
+    "categoria": "R2",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 6058.0,
+    "uso_red_bruto": 29041.86,
+    "energia_bruta": 47758.83,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 27974.04,
+    "subtotal_tarifario": 54884.65,
+    "notas": [
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "09_cruza_trimestre",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 150,
+    "mes": "2026-11"
+  },
+  "esperado": {
+    "mes": "2026-11",
+    "kwh": 150,
+    "categoria": "R1",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 5116.0,
+    "uso_red_bruto": 14287.2,
+    "energia_bruta": 23867.61,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 0.0,
+    "subtotal_tarifario": 43270.81,
+    "notas": [
+      "fuera de la vigencia cargada (2026-08-01 a 2026-10-31): verificar la resolución del trimestre correspondiente",
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

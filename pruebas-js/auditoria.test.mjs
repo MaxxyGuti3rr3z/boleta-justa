@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { TABLAS } from '../cliente/tablas.js';
-import { auditar, seleccionarTabla, precioRedPorBloques, mesDe, cercana } from '../cliente/auditoria.js';
+import { auditar, seleccionarTabla, precioRedPorBloques, mesDe, cercana,
+  MENSAJE_CUADRO_NO_DISPONIBLE } from '../cliente/auditoria.js';
 
 const cats = TABLAS.find(t => t.resolucion.startsWith('227')).t1_residencial.categorias;
 const redBloques = precioRedPorBloques(cats, 189.5);
@@ -46,6 +47,23 @@ test('punitorios solo sealan dentro de la vigencia del Decreto 5658', () => {
   const anterior = auditar({ ...boleta(), fecha_emision: '05/02/2026' }, TABLAS);
   assert.equal(vigente.punitorios_en_vigencia, true);
   assert.equal(anterior.punitorios_en_vigencia, false);
+});
+
+test('VAD sin coincidencia: estado explícito, sin cuadro más cercano', () => {
+  const rara = {
+    fecha_emision: '05/12/2026', categoria: 'T1TS',
+    energia: { cargo_fijo: 999999, precio_red: 777.7777,
+      cargo_consumo: 100, precio_consumo: 200 },
+  };
+  const { tabla, confianza } = seleccionarTabla(rara, TABLAS);
+  assert.equal(tabla, null);
+  assert.equal(confianza, 'baja');
+  const r = auditar(rara, TABLAS);
+  assert.equal(r.estado, 'cuadro_no_disponible');
+  assert.equal(r.resolucion, null);
+  assert.equal(r.confianza, 'baja');
+  assert.ok(r.score_vad_pct > 3);
+  assert.equal(r.mensaje, MENSAJE_CUADRO_NO_DISPONIBLE);
 });
 
 test('sin datos VAD devuelve estado explícito y cercana usa tolerancia relativa', () => {

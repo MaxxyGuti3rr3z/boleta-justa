@@ -6,6 +6,11 @@ en el panel sale de acá.
 """
 from __future__ import annotations
 
+try:
+    from .auditoria import MENSAJE_CUADRO_NO_DISPONIBLE
+except ImportError:  # import directo en tests
+    from auditoria import MENSAJE_CUADRO_NO_DISPONIBLE
+
 
 def _mes(mes: str | None) -> str:
     nombres = {"01": "enero", "02": "febrero", "03": "marzo", "04": "abril",
@@ -22,6 +27,20 @@ def explicar(aud: dict, boleta: dict | None = None) -> dict:
     """Devuelve {titulo, estado, resumen, items, acciones, glosario}."""
     boleta = boleta or {}
     items: list[dict] = []
+
+    if aud.get("estado") == "cuadro_no_disponible":
+        return {
+            "titulo": "Todavía no podemos comparar esta boleta",
+            "estado": "sin_cuadro",
+            "resumen": aud.get("mensaje") or MENSAJE_CUADRO_NO_DISPONIBLE,
+            "items": [{"icono": "ℹ️", "titulo": "Qué significa",
+                       "texto": "Necesitamos el cuadro tarifario oficial de ese trimestre para saber si "
+                                "los cargos coinciden. Mientras tanto no podemos afirmar que esté "
+                                "bien ni mal."}],
+            "acciones": ["Pedile a EJESA el desglose de tu boleta.",
+                         "Cuando carguemos el cuadro, vas a poder compararla acá."],
+            "glosario": [],
+        }
 
     if aud.get("estado") != "auditada":
         return {

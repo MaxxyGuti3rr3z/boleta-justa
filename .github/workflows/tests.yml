@@ -22,6 +22,8 @@ jobs:
         run: python pruebas/test_parser.py
       - name: Auditoria contra cuadros historicos (seleccion por VAD)
         run: python pruebas/test_auditoria.py
+      - name: Validador de cuadros (esquema, vigencias, bloques)
+        run: python pruebas/test_cuadros.py
       - name: Explicacion en lenguaje llano (sin datos personales)
         run: python pruebas/test_explicar.py
       - name: Modo deploy publico (consentimiento y rate limit)
@@ -34,8 +36,12 @@ jobs:
         run: python pruebas/test_auth.py
       - name: Historial por usuario (solo payload validado, aislado)
         run: python pruebas/test_historial.py
+      - name: Paridad Python/JS (mismo JSON de casos)
+        run: python pruebas/test_paridad.py
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Paridad JS/Python (mismo JSON de casos)
+        run: node --test pruebas-js/paridad.test.mjs
       - name: Cliente sin servidor (parser/auditoría/explicación en navegador)
         run: node --test pruebas-js/*.test.mjs

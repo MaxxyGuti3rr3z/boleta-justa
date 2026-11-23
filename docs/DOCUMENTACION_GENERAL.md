@@ -105,6 +105,8 @@ Regla: la lógica de negocio vive en `src/` (Python) y se replica en `cliente/`
 | `payload.js` | Lista blanca y validación del payload exportable |
 | `history.js` | Historial en `localStorage`, exportación e importación JSON |
 | `tablas.js` | Generado desde los 6 JSON oficiales; no editar a mano |
+| `tarifas.js` | Port de `src/tarifas.py` (calculadora TS/SEF/RE), cubierto por tests de paridad |
+| `vendor/pdfjs/` | pdf.js 6.5.438 + worker + LICENSE + README con hashes (sin CDN) |
 
 ### Datos, docs y tooling
 
@@ -156,6 +158,13 @@ explícito, los originales; por defecto es solo dry-run.
   por esa norma. Siempre son señales a verificar, nunca veredictos legales.
 - **Sin veredictos**: la herramienta orienta y cita fuentes; no afirma
   irregularidades ni reemplaza un reclamo formal.
+- **Paridad y redondeo**: `pruebas/casos_paridad/*.json` se ejecuta en Python y
+  en JS con los mismos casos. Los importes del cuadro son decimales; al
+  redondear a 2 lugares se usa tolerancia al error binario
+  (350 kWh × 159,1277 = 55.694,695 → $55.694,70) y cero positivo en ambos
+  lados. El marco normativo no fija el criterio de redondeo: se adoptó el
+  redondeo decimal habitual para no perder un centavo por representación
+  binaria.
 
 ## 8. Cuadros tarifarios y fuentes
 
@@ -180,6 +189,9 @@ resolución del trimestre nov-2026/ene-2027 no estaba publicada/indexada en la
 - Auditoría con resolución elegida, confianza, comparación por renglón y notas.
 - Explicación en lenguaje llano y glosario desplegable.
 - Historial local: guardar, ver, borrar, descargar JSON e importar JSON.
+- Carga manual (sin OCR) para boletas en papel o PDF escaneado: si el PDF no
+  tiene texto útil, se ofrece un formulario guiado que produce el mismo objeto
+  interno que `parser.js` y reutiliza la auditoría y la explicación.
 
 ### API local / panel
 - Landing + panel con pestañas Simulador, Verificador y Auditoría.
@@ -259,13 +271,17 @@ Para desplegar con servidor: `Dockerfile` + `.dockerignore` excluyen
 
 - Actualización trimestral de cuadros; la resolución nov-2026/ene-2027 no está
   cargada.
-- El sitio aún no es PWA instalable ni funciona 100% offline (pdf.js se carga
-  de CDN). Es el siguiente paso de producto.
-- Falta la comparación visual de varias boletas del historial local y el botón
-  de copiar resumen para WhatsApp.
+- El sitio es 100% offline después de la primera carga: pdf.js y su worker
+  están empaquetados en `cliente/vendor/pdfjs/` (versión 6.5.438, hashes en
+  `cliente/vendor/pdfjs/README.md`). La CSP fija `connect-src 'self'`. El sitio
+  es PWA instalable: manifest con rutas relativas, íconos 192/512 y service
+  worker cache-first solo de assets; el PDF y los datos del usuario nunca se
+  cachean.
+- Falta la comparación visual de varias boletas del historial local. El botón
+  de copiar resumen para WhatsApp ya está implementado.
 - La UI de login/historial de la API no está conectada (backend listo).
 - Solo se validó el parser con boletas EJESA de los formatos relevados; un PDF
-  escaneado como imagen no se puede analizar con este método.
+  escaneado no se analiza con OCR: se ofrece la carga manual guiada.
 
 ## 14. Glosario
 

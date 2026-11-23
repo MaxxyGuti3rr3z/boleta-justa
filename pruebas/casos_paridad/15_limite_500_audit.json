@@ -1,0 +1,39 @@
+{
+  "id": "15_limite_500_audit",
+  "tipo": "auditar",
+  "entrada": {
+    "fecha_emision": "20/08/2026",
+    "categoria": "T1",
+    "punitorios_detectados": false,
+    "energia": {
+      "cargo_fijo": 4218,
+      "precio_red": 79.77075,
+      "cargo_red": 39885.38,
+      "precio_consumo": 120.9237,
+      "cargo_consumo": 60461.85
+    },
+    "impuestos": {},
+    "otros_cargos": {},
+    "agua": {},
+    "totales": {}
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "categoria_boleta": "T1",
+    "confianza": "alta",
+    "score_vad_pct": 0.03,
+    "estado": "auditada",
+    "resolucion": "420-SUSEPU/2025",
+    "resolucion_por_fecha": "297-SUSEPU/2026",
+    "categoria_tabla": "R1",
+    "cargo_fijo_ok": true,
+    "uso_red_ok": true,
+    "uso_red_metodo": "bloques",
+    "bonif_ts_presente": false,
+    "energia_ok": true,
+    "energia_diff_pct": 0.0,
+    "nota": "Cargos por consumo de energía pueden cambiar dentro del trimestre por resoluciones nacionales (Res. SE 434/437/2025). Cargo fijo y uso de red corresponden al VAD provincial y no cambian en el trimestre.",
+    "punitorios_signal": false,
+    "punitorios_en_vigencia": false
+  }
+}

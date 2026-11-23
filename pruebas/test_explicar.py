@@ -47,6 +47,15 @@ def main():
     r4 = explicar.explicar({"estado": "sin_cuadro_cargado"}, {})
     check(r4["estado"] == "sin_datos", "sin cuadro → sin_datos")
 
+    sincuadro = explicar.explicar({
+        "estado": "cuadro_no_disponible", "mes": "2026-12",
+        "mensaje": explicar.MENSAJE_CUADRO_NO_DISPONIBLE})
+    check(sincuadro["estado"] == "sin_cuadro", "cuadro no disponible → sin_cuadro")
+    check("Todavía no tenemos cargado el cuadro tarifario de este período" in sincuadro["resumen"],
+          "aviso en lenguaje llano")
+    check("pedirle a EJESA el desglose" in sincuadro["resumen"], "sugiere pedir desglose")
+    check(not any(i["icono"] == "⚠️" for i in sincuadro["items"]), "sin veredicto")
+
     r5 = explicar.explicar(base(), {"consistencia": {"coincide_a_pagar": False}})
     check(any("suma no cierra" in i["titulo"] for i in r5["items"]), "suma inconsistente se explica")
 

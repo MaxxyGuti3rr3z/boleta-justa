@@ -73,12 +73,24 @@ def main():
     check(r9["uso_red_ok"] and r9["uso_red_metodo"] == "bloques", "uso de red por bloques")
     check(r9["bonif_ts_presente"], "bonificacion TS en renglon aparte")
 
+    # VAD sin coincidencia: no se elige el más cercano, estado explícito
+    b10 = {**b, "fecha_emision": "05/12/2026",
+           "energia": {"cargo_fijo": 999999.0, "precio_red": 777.7777,
+                       "cargo_consumo": 100.0, "precio_consumo": 200.0}}
+    tabla10, score10, conf10 = au.seleccionar_tabla(b10, tablas)
+    check(tabla10 is None and conf10 == "baja", "selección no devuelve el más cercano")
+    r10 = au.auditar(b10, tablas)
+    check(r10["estado"] == "cuadro_no_disponible", "estado cuadro_no_disponible")
+    check(r10["resolucion"] is None, "sin resolución inventada")
+    check(r10["confianza"] == "baja" and r10["score_vad_pct"] > 3, "confianza baja con score")
+    check(r10["mensaje"] == au.MENSAJE_CUADRO_NO_DISPONIBLE, "mensaje en lenguaje llano")
+
     if fallos:
         print(f"FALLOS ({len(fallos)}):")
         for f in fallos:
             print(" -", f)
         sys.exit(1)
-    print("OK: 6 cuadros, selección por mes, VAD exacto, pass through julio, mes sin cuadro, bloques de red")
+    print("OK: 6 cuadros, selección por mes, VAD exacto, pass through julio, mes sin cuadro, bloques de red, cuadro no disponible")
 
 
 if __name__ == "__main__":

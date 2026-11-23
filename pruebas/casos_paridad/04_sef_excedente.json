@@ -1,0 +1,26 @@
+{
+  "id": "04_sef_excedente",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 350,
+    "mes": "2026-08",
+    "sef": true
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "kwh": 350,
+    "categoria": "R3",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 10180.0,
+    "uso_red_bruto": 34359.36,
+    "energia_bruta": 55694.7,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 27974.04,
+    "subtotal_tarifario": 72260.02,
+    "notas": [
+      "consumo por encima del bloque base SEF (300 kWh): el excedente va a precio pleno",
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

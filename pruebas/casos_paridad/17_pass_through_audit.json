@@ -1,0 +1,39 @@
+{
+  "id": "17_pass_through_audit",
+  "tipo": "auditar",
+  "entrada": {
+    "fecha_emision": "20/08/2026",
+    "categoria": "T1",
+    "punitorios_detectados": false,
+    "energia": {
+      "cargo_fijo": 4772,
+      "precio_red": 89.141131,
+      "cargo_red": 16892.24,
+      "precio_consumo": 156.2036,
+      "cargo_consumo": 29600.58
+    },
+    "impuestos": {},
+    "otros_cargos": {},
+    "agua": {},
+    "totales": {}
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "categoria_boleta": "T1",
+    "confianza": "alta",
+    "score_vad_pct": 0.17,
+    "estado": "auditada",
+    "resolucion": "227-SUSEPU/2026",
+    "resolucion_por_fecha": "297-SUSEPU/2026",
+    "categoria_tabla": "R1",
+    "cargo_fijo_ok": true,
+    "uso_red_ok": true,
+    "uso_red_metodo": "bloques",
+    "bonif_ts_presente": false,
+    "energia_ok": false,
+    "energia_diff_pct": 4.2,
+    "nota": "Cuadro con dos columnas: MAY-JUN/26 y JUL/26. Se cargan los valores MAY-JUN; en julio la energía plena sube (R1 de 149,9075 a 158,2890) por Res. SE 151/146/2026. Cargo fijo y uso de red no cambian en el trimestre.",
+    "punitorios_signal": false,
+    "punitorios_en_vigencia": false
+  }
+}

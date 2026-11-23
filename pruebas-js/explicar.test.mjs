@@ -23,6 +23,16 @@ test('explicación en lenguaje llano con mes natural y glosario', () => {
   assert.match(textos, /Decreto 5658/);
 });
 
+test('sin cuadro disponible avisa en lenguaje llano y no da veredicto', () => {
+  const x = explicar({ estado: 'cuadro_no_disponible', mes: '2026-12',
+    mensaje: 'Todavía no tenemos cargado el cuadro tarifario de este período, así que no podemos compararlo. Podés pedirle a EJESA el desglose.' });
+  assert.equal(x.estado, 'sin_cuadro');
+  assert.match(x.resumen, /Todavía no tenemos cargado el cuadro tarifario/);
+  assert.match(x.resumen, /pedirle a EJESA el desglose/);
+  assert.ok(!x.items.some(i => i.icono === '⚠️'));
+  assert.match(x.items[0].texto, /no podemos afirmar/);
+});
+
 test('sin datos devuelve estado sin_datos', () => {
   assert.equal(explicar({ estado: 'sin_cuadro_cargado' }).estado, 'sin_datos');
 });

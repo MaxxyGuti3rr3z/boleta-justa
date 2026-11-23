@@ -9,7 +9,7 @@ datos que maneja el proyecto.
 
 ```
 Navegador (sitio estático, GitHub Pages / Netlify / Cloudflare Pages)
-  ├─ pdf.js (CDN) ............ extrae el texto del PDF
+  ├─ pdf.js local (cliente/vendor/pdfjs) .. extrae el texto del PDF
   ├─ parser JS ............... port de src/parser_boletas.py
   ├─ auditoría JS ............ port de src/auditoria.py (VAD + bloques)
   ├─ explicación JS .......... port de src/explicar.py
@@ -28,7 +28,9 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
 
 ## Qué se elimina respecto del deploy con servidor
 
-- `POST /api/auditar` y el archivo temporal en disco del host.
+- Sin dependencias de CDN: pdf.js y su worker están en `cliente/vendor/pdfjs/`
+  con versión fija, licencia y hashes documentados. La CSP de `index.html`
+  fija `connect-src 'self'` y bloquea scripts y formularios externos.
 - `GET /api/auditoria` y los parseos del dueño (`boletas_reales/_parseado/`).
 - Login / cuentas / sesiones (ver más abajo).
 - Rate limit, tope de páginas en servidor, HTTPS para el upload.

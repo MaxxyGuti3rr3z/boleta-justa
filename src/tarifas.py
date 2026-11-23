@@ -45,6 +45,17 @@ def _bloques(kwh: float, bloques: list, tope: float | None = None) -> float:
     return total
 
 
+def _r2(valor: float) -> float:
+    """Redondeo a 2 decimales con tolerancia al error binario de coma flotante.
+
+    Ejemplo documentado: 350 kWh × 159,1277 = 55.694,695 → $55.694,70.
+    `round(159.1277 * 350, 2)` da 55.694,69 por representación binaria;
+    el valor publicado en el cuadro es decimal y manda redondear hacia arriba.
+    La implementación JS usa el mismo criterio (cliente/tarifas.js).
+    """
+    return round(valor + 1e-9, 2)
+
+
 def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
              sef: bool = False, electrodependiente: bool = False,
              tarifas: dict | None = None) -> dict:
@@ -113,13 +124,13 @@ def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
         "kwh": kwh,
         "categoria": cat["id"],
         "resolucion": t["resolucion"],
-        "cargo_fijo": round(fijo, 2),
-        "uso_red_bruto": round(red, 2),
-        "energia_bruta": round(energia, 2),
-        "descuento_tarifa_social_fijo": round(d_ts_fijo, 2),
-        "descuento_tarifa_social_red": round(d_ts_red, 2),
-        "descuento_sef_energia": round(d_sef, 2),
-        "subtotal_tarifario": round(subtotal, 2),
+        "cargo_fijo": _r2(fijo),
+        "uso_red_bruto": _r2(red),
+        "energia_bruta": _r2(energia),
+        "descuento_tarifa_social_fijo": _r2(d_ts_fijo),
+        "descuento_tarifa_social_red": _r2(d_ts_red),
+        "descuento_sef_energia": _r2(d_sef),
+        "subtotal_tarifario": _r2(subtotal),
         "notas": notas + ["subtotal SIN impuestos (IVA, tasas municipales, etc.): "
                           "esa capa se suma en la boleta real"],
     }

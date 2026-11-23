@@ -1,0 +1,25 @@
+{
+  "id": "02_ts_r2",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 300,
+    "mes": "2026-08",
+    "tarifa_social": true
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "kwh": 300,
+    "categoria": "R2",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 6058.0,
+    "uso_red_bruto": 29041.86,
+    "energia_bruta": 47758.83,
+    "descuento_tarifa_social_fijo": 6058.0,
+    "descuento_tarifa_social_red": 5749.95,
+    "descuento_sef_energia": 0.0,
+    "subtotal_tarifario": 71050.74,
+    "notas": [
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "05_electrodependiente",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 150,
+    "mes": "2026-08",
+    "electrodependiente": true
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "kwh": 150,
+    "categoria": "RE",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 28154.0,
+    "uso_red_bruto": 14287.2,
+    "energia_bruta": 23867.61,
+    "descuento_tarifa_social_fijo": 28154.0,
+    "descuento_tarifa_social_red": 14287.2,
+    "descuento_sef_energia": 23867.61,
+    "subtotal_tarifario": 0.0,
+    "notas": [
+      "electrodependiente: bonificación total de componentes tarifarios",
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

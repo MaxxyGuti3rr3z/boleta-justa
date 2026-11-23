@@ -1,0 +1,40 @@
+{
+  "id": "11_ts_en_boleta",
+  "tipo": "auditar",
+  "entrada": {
+    "fecha_emision": "20/08/2026",
+    "categoria": "T1TS",
+    "punitorios_detectados": false,
+    "energia": {
+      "cargo_fijo": 5116,
+      "precio_red": 95.572796,
+      "cargo_red": 18111.04,
+      "precio_consumo": 159.1174,
+      "cargo_consumo": 30152.75,
+      "bonif_tarifa_social": -7417.13
+    },
+    "impuestos": {},
+    "otros_cargos": {},
+    "agua": {},
+    "totales": {}
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "categoria_boleta": "T1TS",
+    "confianza": "alta",
+    "score_vad_pct": 0.17,
+    "estado": "auditada",
+    "resolucion": "297-SUSEPU/2026",
+    "resolucion_por_fecha": "297-SUSEPU/2026",
+    "categoria_tabla": "R1",
+    "cargo_fijo_ok": true,
+    "uso_red_ok": true,
+    "uso_red_metodo": "bloques",
+    "bonif_ts_presente": true,
+    "energia_ok": true,
+    "energia_diff_pct": 0.0,
+    "nota": "El Art. 2 de la Res. 297 incorpora automáticamente las variaciones nacionales de precios (Pass Through) durante el trimestre; el VAD provincial queda fijo. EJESA publica como vigente esta resolución + Res. SE Nación 222, 225 y 272/2026. La resolución del trimestre nov-2026/ene-2027 NO estaba publicada/indexada al 21/11/2026: verificar antes de calcular facturas de noviembre en adelante.",
+    "punitorios_signal": false,
+    "punitorios_en_vigencia": false
+  }
+}

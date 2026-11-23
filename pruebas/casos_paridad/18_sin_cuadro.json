@@ -1,0 +1,28 @@
+{
+  "id": "18_sin_cuadro",
+  "tipo": "auditar",
+  "entrada": {
+    "fecha_emision": "05/12/2026",
+    "categoria": "T1",
+    "punitorios_detectados": false,
+    "energia": {
+      "cargo_fijo": 999999.0,
+      "precio_red": 777.7777,
+      "cargo_consumo": 100.0,
+      "precio_consumo": 200.0
+    },
+    "impuestos": {},
+    "otros_cargos": {},
+    "agua": {},
+    "totales": {}
+  },
+  "esperado": {
+    "mes": "2026-12",
+    "categoria_boleta": "T1",
+    "confianza": "baja",
+    "score_vad_pct": 795.03,
+    "estado": "cuadro_no_disponible",
+    "resolucion": null,
+    "mensaje": "Todavía no tenemos cargado el cuadro tarifario de este período, así que no podemos compararlo. Podés pedirle a EJESA el desglose."
+  }
+}

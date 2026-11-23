@@ -1,0 +1,24 @@
+{
+  "id": "08_limite_500",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 500,
+    "mes": "2026-08"
+  },
+  "esperado": {
+    "mes": "2026-08",
+    "kwh": 500,
+    "categoria": "R3",
+    "resolucion": "297-SUSEPU/2026",
+    "cargo_fijo": 10180.0,
+    "uso_red_bruto": 49084.8,
+    "energia_bruta": 79563.85,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 0.0,
+    "subtotal_tarifario": 138828.65,
+    "notas": [
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

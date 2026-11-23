@@ -54,6 +54,7 @@ a{color:var(--acento)}
   background:var(--acento-suave);border-radius:8px;font-size:.88rem;line-height:1.55}
 #payload-ia{font-size:.7rem;color:var(--suave);white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}
 .expl-card.a_revisar{border-left-color:var(--acento)}
+.expl-card.sin_cuadro{border-left-color:var(--acento)}
 .expl-card.sin_datos{border-left-color:var(--suave)}
 .expl-card h2{font-size:1.25rem;margin-bottom:6px}
 .expl-resumen{color:var(--suave);font-size:.9rem;line-height:1.55;margin-bottom:14px}
@@ -668,7 +669,7 @@ function cargarAuditoria() {
     el.innerHTML = '<div class="aud-grid">' + rs.map(r => {
       if (r.estado !== 'auditada') {
         return `<div class="card aud-card"><h3>Boleta ${r.boleta}</h3>
-          <div class="dec-dias">${r.mes || 'sin fecha'} · sin cuadro cargado para ese período</div></div>`;
+          <div class="dec-dias">${r.mes || 'sin fecha'} · ${r.mensaje || 'sin cuadro cargado para ese período'}</div></div>`;
       }
       const chk = (ok, nombre) => `<span class="${ok ? 'chip-ok' : 'chip-diff'}">` +
         `${ok ? 'OK' : 'DIFIERE'} ${nombre}</span>`;

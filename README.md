@@ -170,7 +170,39 @@ y cambiar los `import` en `app.js`.
 El cliente incluye historial **local**: "Guardar análisis actual" escribe en
 `localStorage` (solo el payload validado, máximo 20); se puede ver, borrar,
 exportar a JSON e importar ese JSON en otro dispositivo. No hay cuenta ni
-servidor: la persona conserva sus propios datos.
+servidor: la persona conserva sus propios datos. Si el PDF es una imagen sin
+texto, se ofrece carga manual guiada (sin OCR) que reutiliza la misma auditoría.
+
+### PWA instalable y offline
+
+`cliente/manifest.webmanifest` usa rutas relativas (`start_url: "./"`, `scope:
+"./"`), por lo que funciona en el subpath `/boleta-justa-web/`. Hay íconos
+192/512 generados y un service worker (`cliente/sw.js`) cache-first **solo**
+para la lista explícita de assets: nunca guarda el PDF ni datos del usuario.
+
+La caché se nombra `boleta-justa-<hash-de-cuadros>`. Al cambiar los JSON de
+`datos/tarifas/`, regenerar versión e íconos:
+
+```bash
+py -3.13 scripts/generar_version_pwa.py
+py -3.13 scripts/generar_tablas_js.py
+```
+
+El panel muestra "Cuadros: N resoluciones · v<hash> · actualizado <fecha>" y,
+si detecta una versión nueva, muestra un aviso con botón "Actualizar".
+
+Para verificar instalabilidad con Lighthouse:
+
+```bash
+npx lighthouse http://127.0.0.1:8100 --only-categories=pwa \
+  --output=html --output-path=./lighthouse.html --chrome-flags="--headless"
+```
+
+(Las versiones nuevas de Lighthouse sacaron la categoría PWA: en ese caso usar
+DevTools → Application → Manifest / Service Workers. Equivalente verificado
+acá: CDP `Page.getInstallabilityErrors` devolvió `[]`.) Para probar offline:
+cargar una vez, DevTools → Network → Offline, recargar y completar el
+formulario manual.
 
 Si se actualiza un cuadro tarifario, la fuente sigue siendo
 `datos/tarifas/*.json`; el script `generar_tablas_js.py` regenera

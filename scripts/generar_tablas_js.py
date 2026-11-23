@@ -7,7 +7,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 TABLAS = RAIZ / "datos" / "tarifas"
 SALIDA = RAIZ / "cliente" / "tablas.js"
 
-datos = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(TABLAS.glob("*.json"))]
+datos = [json.loads(p.read_text(encoding="utf-8"))
+         for p in sorted(TABLAS.glob("*.json")) if not p.name.startswith("_")]
 SALIDA.parent.mkdir(exist_ok=True)
 contenido = ("// Generado por scripts/generar_tablas_js.py — no editar a mano.\n"
              "// Fuente: datos/tarifas/*.json (Boletines Oficiales de Jujuy).\n"

@@ -19,10 +19,21 @@ RAIZ = Path(__file__).resolve().parent.parent
 TABLAS_DIR = RAIZ / "datos" / "tarifas"
 PARSEADAS = RAIZ / "boletas_reales" / "_parseado"
 
+MENSAJE_CUADRO_NO_DISPONIBLE = (
+    "Todavía no tenemos cargado el cuadro tarifario de este período, así que no "
+    "podemos compararlo. Podés pedirle a EJESA el desglose."
+)
+MENSAJE_SIN_DATOS_VAD = (
+    "No encontramos en el PDF los renglones necesarios para comparar. "
+    "Probá con otra boleta de EJESA."
+)
+UMBRAL_CONFIANZA_BAJA = 3.0
+
 
 def cargar_tablas() -> list[dict]:
     return [json.loads(p.read_text(encoding="utf-8"))
-            for p in sorted(TABLAS_DIR.glob("*.json"))]
+            for p in sorted(TABLAS_DIR.glob("*.json"))
+            if not p.name.startswith("_")]
 
 
 def fecha_emision(boleta: dict) -> date | None:
@@ -77,7 +88,11 @@ def seleccionar_tabla(boleta: dict, tablas: list[dict]) -> tuple[dict | None, fl
             mejor = (t, score)
     if mejor is None:
         return None, 0.0, "sin cuadros"
-    confianza = "alta" if mejor[1] < 0.5 else ("media" if mejor[1] < 3 else "baja")
+    confianza = ("alta" if mejor[1] < 0.5 else
+                 ("media" if mejor[1] < UMBRAL_CONFIANZA_BAJA else "baja"))
+    if confianza == "baja":
+        # No devolver el más cercano: un VAD que no calza es cuadro no cargado.
+        return None, round(mejor[1], 2), "baja"
     return mejor[0], round(mejor[1], 2), confianza
 
 
@@ -126,7 +141,13 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
     base = {"mes": mes, "categoria_boleta": boleta.get("categoria"),
             "confianza": confianza, "score_vad_pct": score}
     if not tabla:
-        return {**base, "estado": "sin_cuadro_cargado", "resolucion": None}
+        if confianza == "baja":
+            estado = "cuadro_no_disponible"
+            mensaje = MENSAJE_CUADRO_NO_DISPONIBLE
+        else:
+            estado = "sin_cuadro_cargado"
+            mensaje = MENSAJE_SIN_DATOS_VAD
+        return {**base, "estado": estado, "resolucion": None, "mensaje": mensaje}
     cats = tabla["t1_residencial"]["categorias"]
     e = boleta.get("energia", {})
     cat_fijo = _cercana(cats, "cargo_fijo", e.get("cargo_fijo"))
@@ -181,7 +202,8 @@ def main() -> None:
         r = {"boleta": i, **auditar(boleta, tablas)}
         resultados.append(r)
         if r["estado"] != "auditada":
-            print(f"Boleta {i} ({r['mes']}): SIN CUADRO CARGADO para ese trimestre")
+            print(f"Boleta {i} ({r['mes']}): {r['estado'].upper().replace('_', ' ')} · "
+                  f"{r.get('mensaje', '')}")
             continue
         energia_txt = "OK" if r["energia_ok"] else f"DIFIERE {r['energia_diff_pct']:+}%"
         aviso = ""

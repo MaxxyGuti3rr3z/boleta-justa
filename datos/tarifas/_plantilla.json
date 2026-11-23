@@ -1,0 +1,21 @@
+{
+  "_instrucciones": [
+    "Plantilla sin valores: completar SOLO con datos de la resolución oficial del Boletín Oficial de Jujuy.",
+    "No usar esta plantilla directamente como cuadro: los archivos que empiezan con _ se ignoran en la validación.",
+    "Copiar este archivo a res<numero>_<YYYY-MM-DD>.json y rellenar todos los campos.",
+    "hasta_kwh es el tope acumulativo por bloque; solo la última categoría puede tener null.",
+    "Si el precio de energía cambia dentro del trimestre, no crear otro cuadro: documentarlo en nota_pass_through.",
+    "Ver docs/como-cargar-un-cuadro.md para el paso a paso."
+  ],
+  "resolucion": "",
+  "publicacion": "",
+  "fuente": "",
+  "vigencia": {
+    "desde": "",
+    "hasta": ""
+  },
+  "nota_pass_through": "",
+  "t1_residencial": {
+    "categorias": []
+  }
+}

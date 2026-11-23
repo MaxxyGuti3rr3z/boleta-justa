@@ -1,4 +1,5 @@
 /* Explicación en lenguaje llano — port de src/explicar.js. */
+import { MENSAJE_CUADRO_NO_DISPONIBLE } from './auditoria.js';
 
 const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
                'septiembre','octubre','noviembre','diciembre'];
@@ -11,6 +12,17 @@ function nombreMes(mes) {
 
 export function explicar(aud, boleta = {}) {
   const items = [];
+  if (aud.estado === 'cuadro_no_disponible') {
+    return {
+      titulo: 'Todavía no podemos comparar esta boleta', estado: 'sin_cuadro',
+      resumen: aud.mensaje || MENSAJE_CUADRO_NO_DISPONIBLE,
+      items: [{ icono: 'ℹ️', titulo: 'Qué significa',
+        texto: 'Necesitamos el cuadro tarifario oficial de ese trimestre para saber si los cargos coinciden. Mientras tanto no podemos afirmar que esté bien ni mal.' }],
+      acciones: ['Pedile a EJESA el desglose de tu boleta.',
+        'Cuando carguemos el cuadro, vas a poder compararla acá.'],
+      glosario: [],
+    };
+  }
   if (aud.estado !== 'auditada') {
     return {
       titulo: 'No pudimos auditar esta boleta', estado: 'sin_datos',
