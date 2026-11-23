@@ -146,6 +146,9 @@ están aisladas por usuario: otro id no puede ver ni borrar el análisis.
 
 ## Cliente sin servidor (cero riesgo)
 
+**Sitio publicado: https://maxxyguti3rr3z.github.io/boleta-justa-web/**
+(repo de la web estática: https://github.com/MaxxyGuti3rr3z/boleta-justa-web).
+
 La carpeta `cliente/` es un sitio estático que lee el PDF con pdf.js y hace
 TODA la auditoría en el navegador. No hay backend, no hay upload, no se guarda
 nada: el dato sensible nunca sale del dispositivo. Para probarlo:
