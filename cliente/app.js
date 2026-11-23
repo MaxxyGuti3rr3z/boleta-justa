@@ -4,6 +4,8 @@ import { parsear } from './parser.js';
 import { auditar } from './auditoria.js';
 import { explicar } from './explicar.js';
 import { TABLAS } from './tablas.js';
+import { construir as construirPayload } from './payload.js';
+import * as hist from './history.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.5.438/build/pdf.worker.min.mjs';
@@ -14,6 +16,7 @@ const boton = $('analizar');
 const estado = $('estado');
 const drop = $('drop');
 let archivo = null;
+let ultimoPayload = null;
 
 function elegir(f) {
   if (!f) return;
@@ -75,8 +78,10 @@ boton.addEventListener('click', async () => {
     const boleta = parsear(lineas);
     const auditoria = auditar(boleta, TABLAS);
     const explicacion = explicar(auditoria, boleta);
+    ultimoPayload = construirPayload(boleta, auditoria);
     window.__bj = { boleta, auditoria }; // solo en memoria del navegador, para depuración
     pintar(explicacion);
+    renderHistorial();
     estado.textContent = 'Listo. Nada se subió ni se guardó.';
   } catch (e) {
     $('resultado').innerHTML = `<div class="expl a_revisar"><h2>No pudimos leer el PDF</h2>
@@ -87,3 +92,63 @@ boton.addEventListener('click', async () => {
     boton.disabled = false;
   }
 });
+
+/* ---------- historial local (sin cuenta, sin servidor) ---------- */
+function renderHistorial() {
+  const items = hist.listar();
+  $('hist-lista').innerHTML = items.length
+    ? items.map(i => `<div class="hist-item"><span>${i.mes || 'sin mes'} · ${i.resolucion || '—'}</span>` +
+        `<span><button type="button" data-ver="${i.id}">Ver</button> ` +
+        `<button type="button" data-del="${i.id}">Borrar</button></span></div>`).join('')
+    : 'Todavía no guardaste ningún análisis.';
+  document.querySelectorAll('[data-ver]').forEach(b => b.onclick = () => {
+    const p = hist.obtener(b.dataset.ver);
+    if (p && p.auditoria) {
+      ultimoPayload = p;
+      const aud = { ...p.auditoria, mes: p.mes };
+      pintar(explicar(aud, p));
+    }
+  });
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    hist.borrar(b.dataset.del);
+    renderHistorial();
+  });
+}
+
+$('guardar-local').onclick = () => {
+  if (!ultimoPayload) { estado.textContent = 'Primero analizá una boleta.'; return; }
+  try {
+    hist.guardar(ultimoPayload);
+    renderHistorial();
+    estado.textContent = 'Análisis guardado solo en este dispositivo.';
+  } catch (e) { estado.textContent = e.message; }
+};
+
+$('exportar-json').onclick = () => {
+  const blob = new Blob([hist.exportar()], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'boleta-justa-analyisis.json';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+$('importar-json').addEventListener('change', async ev => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  try {
+    const n = hist.importar(await f.text());
+    renderHistorial();
+    estado.textContent = `${n} análisis importados a este dispositivo.`;
+  } catch (e) { estado.textContent = 'No se pudo importar: ' + e.message; }
+  ev.target.value = '';
+});
+
+$('borrar-todo').onclick = () => {
+  hist.borrarTodo();
+  renderHistorial();
+  estado.textContent = 'Historial borrado de este dispositivo.';
+};
+
+renderHistorial();

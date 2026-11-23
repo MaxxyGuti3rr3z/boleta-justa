@@ -161,6 +161,11 @@ Cloudflare Pages (gratis). La librería pdf.js se carga desde jsDelivr; si se
 quiere funcionamiento 100% offline, se pueden bajar los dos `.mjs` a `cliente/`
 y cambiar los `import` en `app.js`.
 
+El cliente incluye historial **local**: "Guardar análisis actual" escribe en
+`localStorage` (solo el payload validado, máximo 20); se puede ver, borrar,
+exportar a JSON e importar ese JSON en otro dispositivo. No hay cuenta ni
+servidor: la persona conserva sus propios datos.
+
 Si se actualiza un cuadro tarifario, la fuente sigue siendo
 `datos/tarifas/*.json`; el script `generar_tablas_js.py` regenera
 `cliente/tablas.js` (no editar ese archivo a mano).
@@ -233,8 +238,8 @@ pruebas/test_limpieza.py      tests de limpieza con fixtures sintéticas
 pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
 pruebas/test_auth.py          tests de login (scrypt, sesiones, sin datos en claro)
 pruebas/test_historial.py     tests de historial aislado y poda/retención
-cliente/                      sitio estático: PDF leído en el navegador, cero upload
-pruebas-js/                   tests del cliente con node:test (11 tests)
+cliente/                      sitio estático: PDF en el navegador + historial local (localStorage/JSON)
+pruebas-js/                   tests del cliente con node:test (17 tests)
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano
