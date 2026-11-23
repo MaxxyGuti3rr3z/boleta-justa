@@ -66,7 +66,7 @@ carga pesa ~10-15 MB. Es válida si se quiere una sola fuente de verdad.
 4. ✅ Sitio estático `cliente/` verificado en navegador con una boleta real:
     fecha, resolución y explicación correctas, y **cero llamadas de red** con
     el PDF durante el análisis (espiando fetch/XHR).
-5. ⏳ Publicación: subir `cliente/` a GitHub Pages / Netlify / Cloudflare Pages.
+5. ✅ Publicación: https://maxxyguti3rr3z.github.io/boleta-justa-web/
 
 La API local sigue disponible para desarrollo; la versión pública recomendada
 es el cliente estático. Las decisiones (sin login, IA solo con payload mínimo)

@@ -7,6 +7,9 @@ de reclamos donde no hay oficinas físicas. Proyecto cívico hermano de
 [cuando-llega-jujuy](https://github.com/MaxxyGuti3rr3z/cuando-llega-jujuy):
 datos en manos de la gente, sin depender de la empresa.
 
+**Documentación general**: `docs/DOCUMENTACION_GENERAL.md` (arquitectura,
+módulos, endpoints, decisiones y pendientes de todo el proyecto).
+
 **Problema**: facturas de $300.000-$600.000 en hogares vulnerables, impuestos
 hasta 45% de la boleta, cortes que no respetan los 20 días de gracia del
 decreto de emergencia, pueblos sin oficinas para reclamar, 11.000 firmas
@@ -33,7 +36,7 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   comparación sin/con subsidios) y verificador de cortes/medidor/punitorios
   con badges y citas normativas. Identidad: ámbar eléctrico sobre carbón,
   Space Grotesk, números tabulares. Routing por hash (#panel).
-- **Fase 1 (EN CURSO)**: parser de boletas reales (`src/parser_boletas.py`,
+- **Fase 1 HECHA**: parser de boletas reales (`src/parser_boletas.py`,
   pypdf local) + auditoría (`src/auditoria.py`) contra 6 cuadros históricos
   oficiales cargados en `datos/tarifas/` (Res. 168/2025, 296/2025, 420/2025,
   81/2026, 227/2026, 297/2026). El cuadro se identifica por coincidencia de los
@@ -65,9 +68,9 @@ vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
   (`pruebas/test_parser.py`): nunca se commitean boletas ni sus textos.
   Validado en 5 boletas reales (2025-10 a 2026-08): 100% de campos clave
   extraídos, consistencia aritmética verificada.
-- **Pendiente de la fase 1**: cargar los cuadros tarifarios históricos (Res.
-  105/227/297/2026 y resoluciones 2025) — las boletas son de otros trimestres
-  y contra el cuadro de ago-2026 todas las comparaciones difieren (esperado).
+- **Estado de la fase 1**: cerrada. Las 5 boletas reales (2025-10 a 2026-08)
+  se auditan contra su cuadro con confianza alta; lo único que queda como
+  seguimiento es el pass through de energía dentro del trimestre.
 - Tests: `py -3.13 pruebas/test_tarifas.py` y `pruebas/test_decreto.py`.
   `venv\Scripts\python.exe pruebas\test_parser.py`.
 
