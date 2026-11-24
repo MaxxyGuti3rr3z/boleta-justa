@@ -80,6 +80,45 @@ export const TABLAS = [
    "hasta": "2026-07-31"
   },
   "nota_pass_through": "Cuadro con dos columnas: MAY-JUN/26 y JUL/26. Se cargan los valores MAY-JUN; en julio la energía plena sube (R1 de 149,9075 a 158,2890) por Res. SE 151/146/2026. Cargo fijo y uso de red no cambian en el trimestre.",
+  "referencia_normativa_sef_2026": {
+   "resolucion": "105-SUSEPU/2026",
+   "publicacion": "Boletín Oficial de Jujuy Nº 39, 01/04/2026",
+   "fuente": "https://boletinoficial.jujuy.gob.ar/?p=330322",
+   "fragmento": "ARTICULO 1º.- Instruir a la empresa concesionaria EJESA a aplicar a los usuarios beneficiarios del Sistema de Enfoque Federal (SEF), durante el año 2026, la bonificación adicional extraordinaria sobre el consumo base de hasta el VEINTICINCO POR CIENTO (25 %), conforme a lo establecido en el Decreto N° 943/2025. La bonificación resultante se adicionará a la bonificación general establecida en el Artículo 7° del referido Decreto.",
+   "relacion": "diferencial",
+   "porcentajes_bonificacion_total": {
+    "2026-01": 75.0,
+    "2026-02": 72.73,
+    "2026-03": 70.45,
+    "2026-04": 68.18,
+    "2026-05": 65.91,
+    "2026-06": 63.64,
+    "2026-07": 61.36,
+    "2026-08": 59.09,
+    "2026-09": 56.82,
+    "2026-10": 54.55,
+    "2026-11": 52.27
+   },
+   "consumos_base_zona_kwh": {
+    "muy_calido": {
+     "ene_feb_dic": 550,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "calido": {
+     "ene_feb_dic": 370,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "resto": {
+     "ene_feb_dic": 300,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    }
+   },
+   "fragmento_consumos_base": "ZONA/MESES MUY CÁLIDO CÁLIDO RESTO - Enero, febrero y diciembre 550 kWh/mes 370 kWh/mes 300 kWh/mes - Mayo, junio, julio y agosto 300 kWh/mes 300 kWh/mes 300 kWh/mes - Marzo, abril, septiembre, octubre y noviembre 150 kWh/mes 150 kWh/mes 150 kWh/mes. Que, en particular, para los meses de marzo y abril de 2026, corresponde aplicar un límite uniforme de consumo base de CIENTO CINCUENTA KILOVATIOS HORA (150 kWh/mes) para todas las zonas del territorio nacional.",
+   "nota_discrepancia": "Los porcentajes de mayo a julio de esta Res. 105 (65,91% / 63,64% / 61,36%) difieren de los citados en la nota de este cuadro (60,67% / 61,97% / 69,59%). Se conservan ambas fuentes sin corregir y no se recalculan importes."
+  },
   "energia_julio_2026": {
    "R1": 158.289,
    "R2": 158.4008,
@@ -222,6 +261,45 @@ export const TABLAS = [
    "hasta": "2026-10-31"
   },
   "nota_pass_through": "El Art. 2 de la Res. 297 incorpora automáticamente las variaciones nacionales de precios (Pass Through) durante el trimestre; el VAD provincial queda fijo. EJESA publica como vigente esta resolución + Res. SE Nación 222, 225 y 272/2026. La resolución del trimestre nov-2026/ene-2027 NO estaba publicada/indexada al 21/11/2026: verificar antes de calcular facturas de noviembre en adelante.",
+  "referencia_normativa_sef_2026": {
+   "resolucion": "105-SUSEPU/2026",
+   "publicacion": "Boletín Oficial de Jujuy Nº 39, 01/04/2026",
+   "fuente": "https://boletinoficial.jujuy.gob.ar/?p=330322",
+   "fragmento": "ARTICULO 1º.- Instruir a la empresa concesionaria EJESA a aplicar a los usuarios beneficiarios del Sistema de Enfoque Federal (SEF), durante el año 2026, la bonificación adicional extraordinaria sobre el consumo base de hasta el VEINTICINCO POR CIENTO (25 %), conforme a lo establecido en el Decreto N° 943/2025. La bonificación resultante se adicionará a la bonificación general establecida en el Artículo 7° del referido Decreto.",
+   "relacion": "diferencial",
+   "porcentajes_bonificacion_total": {
+    "2026-01": 75.0,
+    "2026-02": 72.73,
+    "2026-03": 70.45,
+    "2026-04": 68.18,
+    "2026-05": 65.91,
+    "2026-06": 63.64,
+    "2026-07": 61.36,
+    "2026-08": 59.09,
+    "2026-09": 56.82,
+    "2026-10": 54.55,
+    "2026-11": 52.27
+   },
+   "consumos_base_zona_kwh": {
+    "muy_calido": {
+     "ene_feb_dic": 550,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "calido": {
+     "ene_feb_dic": 370,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "resto": {
+     "ene_feb_dic": 300,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    }
+   },
+   "fragmento_consumos_base": "ZONA/MESES MUY CÁLIDO CÁLIDO RESTO - Enero, febrero y diciembre 550 kWh/mes 370 kWh/mes 300 kWh/mes - Mayo, junio, julio y agosto 300 kWh/mes 300 kWh/mes 300 kWh/mes - Marzo, abril, septiembre, octubre y noviembre 150 kWh/mes 150 kWh/mes 150 kWh/mes. Que, en particular, para los meses de marzo y abril de 2026, corresponde aplicar un límite uniforme de consumo base de CIENTO CINCUENTA KILOVATIOS HORA (150 kWh/mes) para todas las zonas del territorio nacional.",
+   "nota_discrepancia": "Los porcentajes de mayo a agosto de esta Res. 105 (65,91% / 63,64% / 61,36% / 59,09%) difieren de los consignados en la tabla de este cuadro (60,67% / 61,97% / 69,59% / 69,59%). Se conservan ambas fuentes sin corregir y no se recalculan importes."
+  },
   "t1_residencial": {
    "nota": "Categoría por consumo mensual total. Los cargos por uso de red y energía se aplican a TODO el consumo al precio de la categoría (no son bloques progresivos). Las bonificaciones SÍ se aplican por bloques.",
    "categorias": [
@@ -502,6 +580,50 @@ export const TABLAS = [
    "hasta": "2026-04-30"
   },
   "nota_pass_through": "Res. SE 22/2026 y Decreto 943/2025 (SEF, bloque base 300 kWh en feb). Los precios de energía pueden ajustarse dentro del trimestre por pass through nacional; cargo fijo y uso de red son VAD provincial (fijos en el trimestre).",
+  "referencia_normativa_sef_2026": {
+   "resolucion": "105-SUSEPU/2026",
+   "publicacion": "Boletín Oficial de Jujuy Nº 39, 01/04/2026",
+   "fuente": "https://boletinoficial.jujuy.gob.ar/?p=330322",
+   "fragmento": "ARTICULO 1º.- Instruir a la empresa concesionaria EJESA a aplicar a los usuarios beneficiarios del Sistema de Enfoque Federal (SEF), durante el año 2026, la bonificación adicional extraordinaria sobre el consumo base de hasta el VEINTICINCO POR CIENTO (25 %), conforme a lo establecido en el Decreto N° 943/2025. La bonificación resultante se adicionará a la bonificación general establecida en el Artículo 7° del referido Decreto.",
+   "relacion": "diferencial",
+   "porcentajes_bonificacion_total": {
+    "2026-01": 75.0,
+    "2026-02": 72.73,
+    "2026-03": 70.45,
+    "2026-04": 68.18,
+    "2026-05": 65.91,
+    "2026-06": 63.64,
+    "2026-07": 61.36,
+    "2026-08": 59.09,
+    "2026-09": 56.82,
+    "2026-10": 54.55,
+    "2026-11": 52.27
+   },
+   "consumos_base_zona_kwh": {
+    "muy_calido": {
+     "ene_feb_dic": 550,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "calido": {
+     "ene_feb_dic": 370,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    },
+    "resto": {
+     "ene_feb_dic": 300,
+     "may_jun_jul_ago": 300,
+     "mar_abr_sep_oct_nov": 150
+    }
+   },
+   "fragmento_consumos_base": "ZONA/MESES MUY CÁLIDO CÁLIDO RESTO - Enero, febrero y diciembre 550 kWh/mes 370 kWh/mes 300 kWh/mes - Mayo, junio, julio y agosto 300 kWh/mes 300 kWh/mes 300 kWh/mes - Marzo, abril, septiembre, octubre y noviembre 150 kWh/mes 150 kWh/mes 150 kWh/mes. Que, en particular, para los meses de marzo y abril de 2026, corresponde aplicar un límite uniforme de consumo base de CIENTO CINCUENTA KILOVATIOS HORA (150 kWh/mes) para todas las zonas del territorio nacional.",
+   "nota_discrepancia": ""
+  },
+  "nota_rectificacion": "Rectificación 104-SUSEPU/2026 (Boletín Oficial de Jujuy Nº 39, 01/04/2026). La propia resolución fecha la Res. 081-SUSEPU/2026 en '03 de marzo de 2026' en el considerando y en el Art. 1°, pero en el Art. 2° consigna '03 de mayo de 2026'. Se deja constancia de la discrepancia sin corregirla; los valores se cargan tal como publica la rectificación. Fuente: https://boletinoficial.jujuy.gob.ar/?p=330321",
+  "parametros": {
+   "lambda_cens_kwh": 2235.58,
+   "nota": "Art. 1 de la Res. 104-SUSEPU/2026: λ = $ 2.235,58 y CENS = 2.235,58 (rectifica el valor 2.182,26 de la Res. 081-SUSEPU/2026)."
+  },
   "t1_residencial": {
    "categorias": [
     {
@@ -513,7 +635,7 @@ export const TABLAS = [
     },
     {
      "id": "R2",
-     "hasta_kwh": 250,
+     "hasta_kwh": 300,
      "cargo_fijo": 5344,
      "uso_red_kwh": 85.3853,
      "energia_plena_kwh": 141.7971

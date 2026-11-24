@@ -1,0 +1,25 @@
+{
+  "id": "23_rect104_r2_280kwh",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 280,
+    "mes": "2026-03",
+    "resolucion": "81"
+  },
+  "esperado": {
+    "mes": "2026-03",
+    "kwh": 280,
+    "categoria": "R2",
+    "resolucion": "81-SUSEPU/2026",
+    "cargo_fijo": 5344.0,
+    "uso_red_bruto": 23907.88,
+    "energia_bruta": 39703.19,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 0.0,
+    "subtotal_tarifario": 68955.07,
+    "notas": [
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}

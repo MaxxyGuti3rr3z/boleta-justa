@@ -4,6 +4,25 @@
   "fuente": "https://boletinoficial.jujuy.gob.ar/?p=433937",
   "vigencia": {"desde": "2026-05-01", "hasta": "2026-07-31"},
   "nota_pass_through": "Cuadro con dos columnas: MAY-JUN/26 y JUL/26. Se cargan los valores MAY-JUN; en julio la energía plena sube (R1 de 149,9075 a 158,2890) por Res. SE 151/146/2026. Cargo fijo y uso de red no cambian en el trimestre.",
+  "referencia_normativa_sef_2026": {
+    "resolucion": "105-SUSEPU/2026",
+    "publicacion": "Boletín Oficial de Jujuy Nº 39, 01/04/2026",
+    "fuente": "https://boletinoficial.jujuy.gob.ar/?p=330322",
+    "fragmento": "ARTICULO 1º.- Instruir a la empresa concesionaria EJESA a aplicar a los usuarios beneficiarios del Sistema de Enfoque Federal (SEF), durante el año 2026, la bonificación adicional extraordinaria sobre el consumo base de hasta el VEINTICINCO POR CIENTO (25 %), conforme a lo establecido en el Decreto N° 943/2025. La bonificación resultante se adicionará a la bonificación general establecida en el Artículo 7° del referido Decreto.",
+    "relacion": "diferencial",
+    "porcentajes_bonificacion_total": {
+      "2026-01": 75.00, "2026-02": 72.73, "2026-03": 70.45, "2026-04": 68.18,
+      "2026-05": 65.91, "2026-06": 63.64, "2026-07": 61.36, "2026-08": 59.09,
+      "2026-09": 56.82, "2026-10": 54.55, "2026-11": 52.27
+    },
+    "consumos_base_zona_kwh": {
+      "muy_calido": {"ene_feb_dic": 550, "may_jun_jul_ago": 300, "mar_abr_sep_oct_nov": 150},
+      "calido": {"ene_feb_dic": 370, "may_jun_jul_ago": 300, "mar_abr_sep_oct_nov": 150},
+      "resto": {"ene_feb_dic": 300, "may_jun_jul_ago": 300, "mar_abr_sep_oct_nov": 150}
+    },
+    "fragmento_consumos_base": "ZONA/MESES MUY CÁLIDO CÁLIDO RESTO - Enero, febrero y diciembre 550 kWh/mes 370 kWh/mes 300 kWh/mes - Mayo, junio, julio y agosto 300 kWh/mes 300 kWh/mes 300 kWh/mes - Marzo, abril, septiembre, octubre y noviembre 150 kWh/mes 150 kWh/mes 150 kWh/mes. Que, en particular, para los meses de marzo y abril de 2026, corresponde aplicar un límite uniforme de consumo base de CIENTO CINCUENTA KILOVATIOS HORA (150 kWh/mes) para todas las zonas del territorio nacional.",
+    "nota_discrepancia": "Los porcentajes de mayo a julio de esta Res. 105 (65,91% / 63,64% / 61,36%) difieren de los citados en la nota de este cuadro (60,67% / 61,97% / 69,59%). Se conservan ambas fuentes sin corregir y no se recalculan importes."
+  },
   "energia_julio_2026": {"R1": 158.2890, "R2": 158.4008, "R3": 158.2983, "R4": 158.1984, "R5": 158.1656, "R6": 158.1982, "R7": 158.1982},
   "t1_residencial": {"categorias": [
     {"id": "R1", "hasta_kwh": 150, "cargo_fijo": 4772, "uso_red_kwh": 88.8382, "energia_plena_kwh": 149.9075},
