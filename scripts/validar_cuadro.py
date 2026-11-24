@@ -11,6 +11,7 @@ global. No modifica ningún archivo.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import date
 from itertools import combinations
@@ -19,10 +20,166 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parent.parent
 TABLAS_DIR = RAIZ / "datos" / "tarifas"
 NUMEROS = (int, float)
+ALCANCE_ENERGIA = "t1_residencial.categorias[].energia_plena_kwh"
+TIPOS_PARTIDA = {"cargo_fijo_y_uso_red", "energia_bloques", "porcentaje"}
+RELACIONES = {"sustituye", "diferencial", "independiente"}
+ZONAS = {"muy_calido", "calido", "resto"}
+PERIODOS_ZONA = {"ene_feb_dic", "may_jun_jul_ago", "mar_abr_sep_oct_nov"}
 
 
 def _numero(v) -> bool:
     return isinstance(v, NUMEROS) and not isinstance(v, bool)
+
+
+def _texto(v) -> bool:
+    return isinstance(v, str) and bool(v.strip())
+
+
+def _url(v) -> bool:
+    return _texto(v) and v.startswith("https://")
+
+
+def _son_numeros(v) -> bool:
+    if isinstance(v, dict):
+        return bool(v) and all(_son_numeros(x) for x in v.values())
+    return _numero(v)
+
+
+def _rango(datos: dict, prefijo: str, errores: list[str]) -> tuple[date | None, date | None]:
+    fechas: dict[str, date] = {}
+    for clave in ("desde", "hasta"):
+        try:
+            fechas[clave] = date.fromisoformat(str(datos.get(clave)))
+        except (TypeError, ValueError):
+            errores.append(f"{prefijo}.{clave} debe ser YYYY-MM-DD")
+    if len(fechas) == 2 and fechas["desde"] > fechas["hasta"]:
+        errores.append(f"{prefijo}: desde es posterior a hasta")
+    return fechas.get("desde"), fechas.get("hasta")
+
+
+def _validar_subperiodos(datos: dict, ids: set[str], errores: list[str]) -> None:
+    subperiodos = datos.get("subperiodos", [])
+    if not isinstance(subperiodos, list):
+        errores.append("subperiodos debe ser una lista")
+        return
+    rangos: list[tuple[date, date]] = []
+    for i, sub in enumerate(subperiodos):
+        pref = f"subperiodos[{i}]"
+        if not isinstance(sub, dict):
+            errores.append(f"{pref} no es un objeto")
+            continue
+        for clave in ("resolucion", "publicacion", "fragmento"):
+            if not _texto(sub.get(clave)):
+                errores.append(f"{pref}: falta o es inválido {clave}")
+        if not _url(sub.get("fuente")):
+            errores.append(f"{pref}: fuente debe ser una URL https://")
+        if sub.get("alcance") != ALCANCE_ENERGIA:
+            errores.append(f"{pref}: alcance no permitido")
+        rango = _rango(sub, pref, errores)
+        if all(rango):
+            rangos.append(rango)  # type: ignore[arg-type]
+        valores = sub.get("valores")
+        if not isinstance(valores, dict) or not valores:
+            errores.append(f"{pref}: valores debe ser un objeto no vacío")
+            continue
+        for cid, valor in valores.items():
+            if cid not in ids:
+                errores.append(f"{pref}.valores: categoría desconocida {cid}")
+            if not _numero(valor) or valor <= 0:
+                errores.append(f"{pref}.valores.{cid}: debe ser > 0")
+    for (a, b), (c, d) in combinations(rangos, 2):
+        if a <= d and c <= b:
+            errores.append("subperiodos con vigencias solapadas")
+
+
+def _validar_partidas(datos: dict, errores: list[str]) -> None:
+    bonificaciones = datos.get("bonificaciones")
+    if bonificaciones is None:
+        return
+    if not isinstance(bonificaciones, dict):
+        errores.append("bonificaciones debe ser un objeto")
+        return
+    for mes, bloque in bonificaciones.items():
+        if mes == "nota":  # texto aclaratorio legacy, no es un mes
+            if not isinstance(bloque, str):
+                errores.append("bonificaciones.nota debe ser texto")
+            continue
+        if not re.fullmatch(r"\d{4}-\d{2}", str(mes)):
+            errores.append(f"bonificaciones: mes inválido {mes}")
+        if not isinstance(bloque, dict):
+            errores.append(f"bonificaciones[{mes}] debe ser un objeto")
+            continue
+        partidas = bloque.get("partidas")
+        if partidas is None:  # forma legacy: claves planas, se conserva
+            continue
+        if not isinstance(partidas, list):
+            errores.append(f"bonificaciones[{mes}].partidas debe ser una lista")
+            continue
+        vistos: set[str] = set()
+        for i, partida in enumerate(partidas):
+            pref = f"bonificaciones[{mes}].partidas[{i}]"
+            if not isinstance(partida, dict):
+                errores.append(f"{pref} no es un objeto")
+                continue
+            pid = partida.get("id")
+            if not _texto(pid):
+                errores.append(f"{pref}: falta id")
+            elif pid in vistos:
+                errores.append(f"{pref}: id duplicado")
+            else:
+                vistos.add(str(pid))
+            origen = partida.get("origen")
+            if not isinstance(origen, dict):
+                errores.append(f"{pref}: falta origen")
+            else:
+                for clave in ("resolucion", "fragmento"):
+                    if not _texto(origen.get(clave)):
+                        errores.append(f"{pref}.origen: falta o es inválido {clave}")
+                if not _url(origen.get("fuente")):
+                    errores.append(f"{pref}.origen.fuente debe ser una URL https://")
+            _rango(partida, pref, errores)
+            if partida.get("tipo") not in TIPOS_PARTIDA:
+                errores.append(f"{pref}: tipo no permitido")
+            valores = partida.get("valores")
+            if not isinstance(valores, dict) or not valores or not all(
+                    _son_numeros(v) for v in valores.values()):
+                errores.append(f"{pref}: valores debe contener importes numéricos")
+
+
+def _validar_referencia_sef(datos: dict, errores: list[str]) -> None:
+    ref = datos.get("referencia_normativa_sef_2026")
+    if ref is None:
+        return
+    if not isinstance(ref, dict):
+        errores.append("referencia_normativa_sef_2026 debe ser un objeto")
+        return
+    for clave in ("resolucion", "publicacion", "fragmento", "fragmento_consumos_base"):
+        if not _texto(ref.get(clave)):
+            errores.append(f"referencia_normativa_sef_2026: falta o es inválido {clave}")
+    if not _url(ref.get("fuente")):
+        errores.append("referencia_normativa_sef_2026.fuente debe ser una URL https://")
+    if ref.get("relacion") not in RELACIONES:
+        errores.append("referencia_normativa_sef_2026.relacion no permitida")
+    if not isinstance(ref.get("nota_discrepancia"), str):
+        errores.append("referencia_normativa_sef_2026: falta nota_discrepancia")
+    porcentajes = ref.get("porcentajes_bonificacion_total")
+    if not isinstance(porcentajes, dict) or not porcentajes:
+        errores.append("referencia_normativa_sef_2026.porcentajes_bonificacion_total inválido")
+    else:
+        for mes, valor in porcentajes.items():
+            if not re.fullmatch(r"\d{4}-\d{2}", str(mes)):
+                errores.append(f"referencia_normativa_sef_2026: mes inválido {mes}")
+            if not _numero(valor) or not 0 <= valor <= 100:
+                errores.append(f"referencia_normativa_sef_2026: porcentaje inválido en {mes}")
+    zonas = ref.get("consumos_base_zona_kwh")
+    if not isinstance(zonas, dict) or set(zonas) != ZONAS:
+        errores.append("referencia_normativa_sef_2026.consumos_base_zona_kwh incompleto")
+    else:
+        for zona, periodos in zonas.items():
+            if not isinstance(periodos, dict) or set(periodos) != PERIODOS_ZONA:
+                errores.append(f"referencia_normativa_sef_2026: periodos inválidos en {zona}")
+            elif not all(_numero(v) and v > 0 for v in periodos.values()):
+                errores.append(f"referencia_normativa_sef_2026: consumos inválidos en {zona}")
 
 
 def validar_archivo(ruta: Path) -> list[str]:
@@ -104,6 +261,10 @@ def validar_archivo(ruta: Path) -> list[str]:
         errores.append("los bloques (hasta_kwh) no están ordenados")
     if len(set(topes)) != len(topes):
         errores.append("hay topes de bloque repetidos")
+
+    _validar_subperiodos(datos, ids, errores)
+    _validar_partidas(datos, errores)
+    _validar_referencia_sef(datos, errores)
     return errores
 
 
