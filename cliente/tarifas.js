@@ -16,6 +16,10 @@ export function categoriaPorConsumo(kwh, t) {
   throw new Error('consumo fuera de categorías');
 }
 
+export function subperiodoPara(t, mes) {
+  return (t.subperiodos || []).find(s => s.desde.slice(0, 7) <= mes && mes <= s.hasta.slice(0, 7)) || null;
+}
+
 function bloques(kwh, lista, tope) {
   let total = 0;
   let anterior = 0;
@@ -35,12 +39,18 @@ export function calcular(kwh, mes = '2026-08', opts = {}, tabla = POR_DEFECTO) {
   const t = tabla;
   const cat0 = categoriaPorConsumo(kwh, t);
   const notas = [];
+  let cat = cat0;
+  const sub = subperiodoPara(t, mes);
+  if (sub?.alcance === 't1_residencial.categorias[].energia_plena_kwh') {
+    const precio = sub.valores?.[cat0.id];
+    if (precio !== undefined) cat = { ...cat0, energia_plena_kwh: Number(precio) };
+    notas.push(`energía según ${sub.resolucion} (${sub.desde} a ${sub.hasta})`);
+  }
   const vig = t.vigencia;
   if (!(vig.desde.slice(0, 7) <= mes && mes <= vig.hasta.slice(0, 7)))
     notas.push(`fuera de la vigencia cargada (${vig.desde} a ${vig.hasta}): ` +
       'verificar la resolución del trimestre correspondiente');
 
-  let cat = cat0;
   let fijo, red, energia;
   if (opts.electrodependiente) {
     const re = t.t1_residencial.especiales.RE;
@@ -49,9 +59,9 @@ export function calcular(kwh, mes = '2026-08', opts = {}, tabla = POR_DEFECTO) {
     red = kwh * re.uso_red_kwh;
     energia = kwh * re.energia_plena_kwh;
   } else {
-    fijo = Number(cat0.cargo_fijo);
-    red = kwh * cat0.uso_red_kwh;
-    energia = kwh * cat0.energia_plena_kwh;
+    fijo = Number(cat.cargo_fijo);
+    red = kwh * cat.uso_red_kwh;
+    energia = kwh * cat.energia_plena_kwh;
   }
 
   let dTsFijo = 0, dTsRed = 0, dSef = 0;
@@ -66,20 +76,26 @@ export function calcular(kwh, mes = '2026-08', opts = {}, tabla = POR_DEFECTO) {
   } else {
     if ((opts.tarifa_social || opts.sef) && !bonif)
       throw new Error(`sin bonificaciones cargadas para ${mes}; cargar el anexo de ese mes antes de calcular`);
-    if (opts.tarifa_social && bonif) {
+    if (opts.tarifa_social && bonif?.tarifa_social) {
       const ts = bonif.tarifa_social;
       if (ts.solo_categorias.includes(cat.id)) dTsFijo = fijo * ts.cargo_fijo_pct / 100;
       else notas.push('consumo >300 kWh: el anexo publicado solo define ' +
         'bonificación de cargo fijo para TS1/TS2 (≤300 kWh); ' +
         'verificar aplicación con boleta real');
       dTsRed = bloques(kwh, ts.uso_red_bloques);
-    }
-    if (opts.sef && bonif) {
+    } else if (opts.tarifa_social && bonif)
+      notas.push('bonificación documentada con otro origen en este anexo; ' +
+        'su aplicación depende del segmento del usuario y de la boleta, ' +
+        'por lo que no se calcula automáticamente');
+    if (opts.sef && bonif?.sef) {
       const base = bonif.sef.bloque_base_kwh;
       dSef = bloques(kwh, bonif.sef.energia_bloques, base);
       if (kwh > base)
         notas.push(`consumo por encima del bloque base SEF (${base} kWh): el excedente va a precio pleno`);
-    }
+    } else if (opts.sef && bonif)
+      notas.push('bonificación SEF documentada con otro origen en este anexo; ' +
+        'su aplicación depende del segmento del usuario y de la boleta, ' +
+        'por lo que no se calcula automáticamente');
   }
 
   const subtotal = fijo + red + energia - dTsFijo - dTsRed - dSef;

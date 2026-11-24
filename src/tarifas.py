@@ -28,6 +28,18 @@ def categoria_por_consumo(kwh: float, tarifas: dict) -> dict:
     raise ValueError("consumo fuera de categorías")  # inalcanzable: R7 es abierta
 
 
+def subperiodo_para(tarifas: dict, mes: str) -> dict | None:
+    """Subperiodo de energía vigente en 'mes' (YYYY-MM), si el cuadro tiene uno.
+
+    El VAD no se toca: el subperiodo solo reemplaza el precio de energía
+    de la categoría, tal como publica la resolución que lo origina.
+    """
+    for sub in tarifas.get("subperiodos", []):
+        if sub["desde"][:7] <= mes <= sub["hasta"][:7]:
+            return sub
+    return None
+
+
 def _bloques(kwh: float, bloques: list, tope: float | None = None) -> float:
     """Descuento total aplicando bloques acumulativos (hasta_kwh por bloque)."""
     total = 0.0
@@ -68,6 +80,13 @@ def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
     t = tarifas or cargar()
     cat = categoria_por_consumo(kwh, t)
     notas = []
+    sub = subperiodo_para(t, mes)
+    if sub and sub.get("alcance") == "t1_residencial.categorias[].energia_plena_kwh":
+        precio = sub.get("valores", {}).get(cat["id"])
+        if precio is not None:
+            cat = {**cat, "energia_plena_kwh": float(precio)}
+        notas.append(f"energía según {sub['resolucion']} "
+                     f"({sub['desde']} a {sub['hasta']})")
 
     vig = t["vigencia"]
     if not (vig["desde"][:7] <= mes <= vig["hasta"][:7]):
@@ -87,7 +106,7 @@ def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
         energia = kwh * cat["energia_plena_kwh"]
     d_ts_fijo = d_ts_red = d_sef = 0.0
 
-    bonif = t["bonificaciones"].get(mes)
+    bonif = t.get("bonificaciones", {}).get(mes)
     if electrodependiente:
         if not bonif:
             raise ValueError(f"sin bonificaciones cargadas para {mes}")
@@ -101,7 +120,7 @@ def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
             if not bonif:
                 raise ValueError(f"sin bonificaciones cargadas para {mes}; "
                                  "cargar el anexo de ese mes antes de calcular")
-        if tarifa_social and bonif:
+        if tarifa_social and bonif and "tarifa_social" in bonif:
             ts = bonif["tarifa_social"]
             if cat["id"] in ts["solo_categorias"]:
                 d_ts_fijo = fijo * ts["cargo_fijo_pct"] / 100
@@ -110,13 +129,21 @@ def calcular(kwh: float, mes: str = "2026-08", tarifa_social: bool = False,
                              "bonificación de cargo fijo para TS1/TS2 (≤300 kWh); "
                              "verificar aplicación con boleta real")
             d_ts_red = _bloques(kwh, ts["uso_red_bloques"])
-        if sef and bonif:
+        elif tarifa_social and bonif:
+            notas.append("bonificación documentada con otro origen en este anexo; "
+                         "su aplicación depende del segmento del usuario y de la boleta, "
+                         "por lo que no se calcula automáticamente")
+        if sef and bonif and "sef" in bonif:
             d_sef = _bloques(kwh, bonif["sef"]["energia_bloques"],
                              tope=bonif["sef"]["bloque_base_kwh"])
             if kwh > bonif["sef"]["bloque_base_kwh"]:
                 notas.append(f"consumo por encima del bloque base SEF "
                              f"({bonif['sef']['bloque_base_kwh']} kWh): el excedente "
                              "va a precio pleno")
+        elif sef and bonif:
+            notas.append("bonificación SEF documentada con otro origen en este anexo; "
+                         "su aplicación depende del segmento del usuario y de la boleta, "
+                         "por lo que no se calcula automáticamente")
 
     subtotal = fijo + red + energia - d_ts_fijo - d_ts_red - d_sef
     return {

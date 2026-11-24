@@ -106,6 +106,20 @@ def _cercana(cats: list[dict], clave: str, valor: float | None, tol_pct=0.3) -> 
     return None
 
 
+def categoria_efectiva(tabla: dict, mes: str | None) -> list[dict]:
+    """Categorías con el precio de energía del subperiodo vigente en 'mes'."""
+    cats = tabla["t1_residencial"]["categorias"]
+    if not mes:
+        return cats
+    for sub in tabla.get("subperiodos", []):
+        if (sub["desde"][:7] <= mes <= sub["hasta"][:7] and
+                sub.get("alcance") == "t1_residencial.categorias[].energia_plena_kwh"):
+            valores = sub.get("valores", {})
+            return [{**c, "energia_plena_kwh": float(valores[c["id"]])}
+                    if c["id"] in valores else c for c in cats]
+    return cats
+
+
 def kwh_de(e: dict) -> float | None:
     consumo, precio = e.get("cargo_consumo"), e.get("precio_consumo")
     if consumo and precio:
@@ -148,7 +162,7 @@ def auditar(boleta: dict, tablas: list[dict]) -> dict:
             estado = "sin_cuadro_cargado"
             mensaje = MENSAJE_SIN_DATOS_VAD
         return {**base, "estado": estado, "resolucion": None, "mensaje": mensaje}
-    cats = tabla["t1_residencial"]["categorias"]
+    cats = categoria_efectiva(tabla, mes)
     e = boleta.get("energia", {})
     cat_fijo = _cercana(cats, "cargo_fijo", e.get("cargo_fijo"))
     cat_red = _cercana(cats, "uso_red_kwh", e.get("precio_red"))

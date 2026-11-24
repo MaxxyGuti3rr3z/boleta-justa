@@ -84,6 +84,17 @@ export function precioRedPorBloques(cats, kwh) {
   return Math.round(total / kwh * 1e6) / 1e6;
 }
 
+export function categoriasEfectivas(tabla, mes) {
+  const cats = tabla.t1_residencial.categorias;
+  if (!mes) return cats;
+  const sub = (tabla.subperiodos || []).find(s =>
+    s.desde.slice(0, 7) <= mes && mes <= s.hasta.slice(0, 7) &&
+    s.alcance === 't1_residencial.categorias[].energia_plena_kwh');
+  if (!sub || !sub.valores) return cats;
+  return cats.map(c => sub.valores[c.id] === undefined ? c :
+    { ...c, energia_plena_kwh: Number(sub.valores[c.id]) });
+}
+
 export function auditar(boleta, tablas) {
   const mes = mesDe(boleta?.fecha_emision);
   const { tabla, score, confianza } = seleccionarTabla(boleta, tablas);
@@ -97,7 +108,7 @@ export function auditar(boleta, tablas) {
       mensaje: sinCuadro ? MENSAJE_CUADRO_NO_DISPONIBLE : MENSAJE_SIN_DATOS_VAD };
   }
 
-  const cats = tabla.t1_residencial.categorias;
+  const cats = categoriasEfectivas(tabla, mes);
   const e = boleta.energia || {};
   const catFijo = cercana(cats, 'cargo_fijo', e.cargo_fijo);
   const catRed = cercana(cats, 'uso_red_kwh', e.precio_red);
