@@ -24,3 +24,6 @@ datos/*.db
 # Herramientas externas
 .atl/
 .junie/
+
+# Artefactos de seguimiento del flujo de trabajo (no son producto)
+odd/
