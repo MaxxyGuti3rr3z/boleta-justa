@@ -12,6 +12,22 @@ except ImportError:  # import directo en tests
     from auditoria import MENSAJE_CUADRO_NO_DISPONIBLE
 
 
+AVISOS = {
+    "valores_provisoriamente_facturados": {
+        "titulo": "Valores aplicados antes del cuadro definitivo: a verificar",
+        "texto": "Esta boleta corresponde a un período en el que algunos precios pudieron aplicarse antes de publicarse el cuadro definitivo, o ajustarse de forma automática por decisiones nacionales (pass through). Por eso no podemos afirmar, solo con este cuadro, que el importe facturado sea el final. A verificar: pedí a EJESA el desglose por renglón y la resolución que aplicó a tu boleta. Fuentes: Res. 476-SUSEPU/2025 (Boletín Nº 149, 29/12/2025), Res. 105-SUSEPU/2026 y Res. 104-SUSEPU/2026 (Boletín Nº 39, 01/04/2026). No calculamos diferencias, créditos ni saldos: esto es una señal para revisar, no un reclamo.",
+        "meses": ("2025-12", "2026-02", "2026-03", "2026-04",
+                  "2026-08", "2026-09", "2026-10"),
+    },
+    "rectificacion_posterior": {
+        "titulo": "Rectificación publicada después: a verificar",
+        "texto": "Para este mismo período se publicó después una resolución que cambió o aprobó valores. Lo que comparamos acá puede no coincidir con lo que se facturó en su momento, y eso por sí solo no dice quién tiene razón. A verificar: preguntá en EJESA qué resolución se aplicó a tu boleta y pedí el desglose. Fuentes: Res. 104-SUSEPU/2026 (rectifica la 81 para feb-abr/2026), Res. 476-SUSEPU/2025 (energía dic-25/ene-26) y la mención de la Res. 297-SUSEPU/2026 sobre boletas de may-jul/2026 emitidas con valores de la 105 y luego comparadas con la 227. No calculamos diferencias, créditos ni saldos: esto es una orientación, no un reclamo.",
+        "meses": ("2025-12", "2026-01", "2026-02", "2026-03", "2026-04",
+                  "2026-05", "2026-06", "2026-07"),
+    },
+}
+
+
 def _mes(mes: str | None) -> str:
     nombres = {"01": "enero", "02": "febrero", "03": "marzo", "04": "abril",
                "05": "mayo", "06": "junio", "07": "julio", "08": "agosto",
@@ -114,6 +130,12 @@ def explicar(aud: dict, boleta: dict | None = None) -> dict:
         items.append({"icono": "⚠️", "titulo": "La suma no cierra",
                       "texto": "Los renglones sumados no dan el total que figura como "
                                "'Total a pagar'. Pedí el desglose antes de pagar."})
+
+    # 7. avisos sobre valores facturados antes de la resolución definitiva
+    for clave, aviso in AVISOS.items():
+        if aud.get("mes") in aviso["meses"]:
+            items.append({"icono": "ℹ️", "titulo": aviso["titulo"],
+                          "texto": aviso["texto"], "clave": clave})
 
     revisiones = sum(1 for i in items if i["icono"] == "⚠️")
     if revisiones == 0:

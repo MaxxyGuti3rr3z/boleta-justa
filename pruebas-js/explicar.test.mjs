@@ -41,3 +41,16 @@ test('suma inconsistente se explica', () => {
   const x = explicar(aud(), { consistencia: { coincide_a_pagar: false } });
   assert.ok(x.items.some(i => i.titulo.includes('suma no cierra')));
 });
+
+test('avisos a verificar no cambian el estado ni calculan saldos', () => {
+  const limpia = { ...aud(), mes: '2026-03', energia_ok: true, energia_diff_pct: 0,
+    punitorios_signal: false, punitorios_en_vigencia: false };
+  const x = explicar(limpia);
+  assert.equal(x.estado, 'en_orden');
+  const claves = x.items.map(i => i.clave).filter(Boolean);
+  assert.ok(claves.includes('valores_provisoriamente_facturados'));
+  assert.ok(claves.includes('rectificacion_posterior'));
+  assert.match(x.items.map(i => i.texto).join(' '), /No calculamos diferencias, créditos ni saldos/);
+  const fuera = explicar({ ...limpia, mes: '2026-11' });
+  assert.ok(!fuera.items.some(i => i.clave));
+});

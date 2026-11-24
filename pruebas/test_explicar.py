@@ -59,7 +59,17 @@ def main():
     r5 = explicar.explicar(base(), {"consistencia": {"coincide_a_pagar": False}})
     check(any("suma no cierra" in i["titulo"] for i in r5["items"]), "suma inconsistente se explica")
 
-    salida = str([r, r2, r3, r4, r5]).lower()
+    r6 = explicar.explicar({**base(), "mes": "2026-03"})
+    claves6 = {i.get("clave") for i in r6["items"]}
+    check("valores_provisoriamente_facturados" in claves6, "aviso de valores provisorios")
+    check("rectificacion_posterior" in claves6, "aviso de rectificación posterior")
+    check(r6["estado"] == "en_orden", "avisos no cambian el estado")
+    textos6 = " ".join(i["texto"] for i in r6["items"])
+    check("No calculamos diferencias, créditos ni saldos" in textos6, "sin cálculo de saldos")
+    r7 = explicar.explicar({**base(), "mes": "2026-11"})
+    check(not any(i.get("clave") for i in r7["items"]), "sin avisos fuera de las ventanas")
+
+    salida = str([r, r2, r3, r4, r5, r6, r7]).lower()
     check(not any(k in salida for k in ("dni", "dirección", "titular", "cuit")),
           "sin datos personales en la explicación")
 
