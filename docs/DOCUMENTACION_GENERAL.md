@@ -131,6 +131,8 @@ créditos, y el service worker precachea solo assets estáticos (nunca el PDF).
 - `datos/tarifas/`: 6 cuadros oficiales con resolución, vigencia y fuente.
 - `docs/marco-normativo.md`: decretos, resoluciones y recortes con citas.
 - `docs/plan-cero-riesgo.md`: decisión de privacidad y estado de la migración.
+- `docs/vigilancia-boletin.md`: aviso semanal de posibles cuadros nuevos (solo
+  notifica; no carga tarifas).
 - `docs/captura-*.png`: capturas de la UI (sin datos personales).
 - `scripts/generar_tablas_js.py`: regenera `tablas.js`.
 - `scripts/limpiar_sensibles.py`: limpieza controlada de datos sensibles.
