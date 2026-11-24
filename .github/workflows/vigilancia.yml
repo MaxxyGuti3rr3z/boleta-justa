@@ -1,0 +1,56 @@
+name: vigilancia
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Una pasada de vigilancia sobre las fuentes públicas
+        run: python scripts/vigilar_boletin.py > vigilancia.json
+      - name: Abrir un issue solo si hay algo nuevo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          import sys
+
+          datos = json.load(open('vigilancia.json', encoding='utf-8'))
+          for aviso in datos['novedades']:
+              clave = aviso['clave']
+              busqueda = subprocess.run(
+                  ['gh', 'issue', 'list', '--state', 'open',
+                   '--search', f'{clave} in:body', '--json', 'number'],
+                  capture_output=True, text=True)
+              if busqueda.returncode:
+                  print(f'No se pudo buscar {clave}: {busqueda.stderr}', file=sys.stderr)
+                  continue
+              if json.loads(busqueda.stdout or '[]'):
+                  print(f'Ya existe un issue abierto para {clave}')
+                  continue
+              cuerpo = (
+                  f"Se detectó **{aviso['valor']}** en la fuente `{aviso['fuente']}`.\n\n"
+                  f"Enlace encontrado: {aviso['url']}\n\n"
+                  "Revisar a mano y cargar con docs/como-cargar-un-cuadro.md\n"
+              )
+              creado = subprocess.run(
+                  ['gh', 'issue', 'create', '--title', 'Posible cuadro tarifario nuevo',
+                   '--body', cuerpo], capture_output=True, text=True)
+              if creado.returncode:
+                  print(f'No se pudo crear el issue para {clave}: {creado.stderr}', file=sys.stderr)
+              else:
+                  print(f'Issue creado para {clave}: {creado.stdout.strip()}')
+          PY

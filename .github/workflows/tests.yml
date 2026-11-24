@@ -36,6 +36,8 @@ jobs:
         run: python pruebas/test_auth.py
       - name: Historial por usuario (solo payload validado, aislado)
         run: python pruebas/test_historial.py
+      - name: Vigilancia del boletín (tests con respuestas simuladas, sin red)
+        run: python pruebas/test_vigilancia.py
       - name: Paridad Python/JS (mismo JSON de casos)
         run: python pruebas/test_paridad.py
       - uses: actions/setup-node@v4
