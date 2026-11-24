@@ -13,7 +13,7 @@ test('manifest instalable con rutas relativas al subpath', () => {
   assert.equal(m.start_url, './');
   assert.equal(m.scope, './');
   assert.equal(m.display, 'standalone');
-  assert.equal(m.theme_color, '#0c0e12');
+  assert.equal(m.theme_color, '#F7F1E6');
   assert.equal(m.icons.length, 2);
   for (const icono of m.icons) {
     assert.ok(icono.src.startsWith('./icons/'), `ícono no relativo: ${icono.src}`);
@@ -55,4 +55,19 @@ test('versión de cuadros explícita y consistente', () => {
   assert.match(html, /id="update-banner"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
   assert.match(html, /default-src 'self'/);
+});
+
+test('aviso de nueva versión exige una versión instalada previamente', () => {
+  const sw = leer('sw.js');
+  assert.match(sw, /version-instalada\.json/);
+  assert.match(sw, /c\.put\(destino\('\.\/version-instalada\.json'\)/);
+  const inicio = sw.indexOf("if (tipo === 'CHECK_VERSION')");
+  const fin = sw.indexOf("if (tipo === 'SKIP_WAITING')");
+  assert.ok(inicio >= 0 && fin > inicio, 'bloque CHECK_VERSION presente');
+  const bloque = sw.slice(inicio, fin);
+  assert.match(bloque, /instalada = marca \? await marca\.json\(\) : null/);
+  assert.match(bloque, /instalada && instalada\.cache !== version\.cache/);
+  const app = leer('app.js');
+  assert.match(app, /NEW_VERSION/);
+  assert.match(app, /update-banner/);
 });
