@@ -57,17 +57,24 @@ def main():
     check(not any(i["icono"] == "⚠️" for i in sincuadro["items"]), "sin veredicto")
 
     r5 = explicar.explicar(base(), {"consistencia": {"coincide_a_pagar": False}})
-    check(any("suma no cierra" in i["titulo"] for i in r5["items"]), "suma inconsistente se explica")
+    check(any("No pudimos verificar el total" in i["titulo"] for i in r5["items"]),
+          "total no verificable se explica")
+    check(not any(i["icono"] == "⚠️" and "total" in i["titulo"] for i in r5["items"]),
+          "total no verificable no es señal")
+    check(r5["estado"] == "en_orden", "total no verificable no cambia el estado")
 
     r6 = explicar.explicar({**base(), "mes": "2026-03"})
-    claves6 = {i.get("clave") for i in r6["items"]}
-    check("valores_provisoriamente_facturados" in claves6, "aviso de valores provisorios")
-    check("rectificacion_posterior" in claves6, "aviso de rectificación posterior")
+    claves6 = {i.get("clave") for i in r6["items"] if i.get("clave")}
+    check(claves6 == {"297"}, "aviso según el cuadro aplicado")
     check(r6["estado"] == "en_orden", "avisos no cambian el estado")
-    textos6 = " ".join(i["texto"] for i in r6["items"])
-    check("No calculamos diferencias, créditos ni saldos" in textos6, "sin cálculo de saldos")
-    r7 = explicar.explicar({**base(), "mes": "2026-11"})
-    check(not any(i.get("clave") for i in r7["items"]), "sin avisos fuera de las ventanas")
+    r7 = explicar.explicar({**base(), "resolucion": "168-SUSEPU/2025"})
+    check(not any(i.get("clave") for i in r7["items"]), "sin aviso para cuadros sin nota")
+    r8 = explicar.explicar({**base(), "resolucion": "227-SUSEPU/2026", "mes": "2026-08"})
+    a227 = next(i for i in r8["items"] if i.get("clave") == "227")
+    fuentes227 = " ".join(a227["fuentes"])
+    check("227-SUSEPU/2026" in fuentes227, "fuentes del aviso coinciden con el cuadro")
+    check(not any(x in fuentes227 for x in ("476-SUSEPU", "105-SUSEPU", "104-SUSEPU")),
+          "fuentes ajenas al cuadro no aparecen")
 
     salida = str([r, r2, r3, r4, r5, r6, r7]).lower()
     check(not any(k in salida for k in ("dni", "dirección", "titular", "cuit")),
