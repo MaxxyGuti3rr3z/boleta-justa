@@ -15,8 +15,13 @@ hasta 45% de la boleta, cortes que no respetan los 20 días de gracia del
 decreto de emergencia, pueblos sin oficinas para reclamar, 11.000 firmas
 vecinales juntadas. Ver `docs/marco-normativo.md` (todo con fuentes).
 
-## Estado (21/11/2026)
+## Estado (24/11/2026)
 
+- **Cliente estático actualizado**: identidad visual Jujuy (fotos de la
+  Quebrada, Hornocal y Salinas con créditos), PWA instalable y offline,
+  subperíodos y bonificaciones documentados, avisos "a verificar" por
+  resolución aplicada, carga manual y historial con copia de seguridad.
+  12 suites Python y 84 tests Node, todos verdes.
 - **Fase 0 HECHA**: marco normativo relevado de fuentes oficiales (Res.
   297-SUSEPU/2026 con cuadro T1 completo, tarifa social Res. 048/24, SEF
   Decreto 943/2025, Decreto Acuerdo 5658-JG/2026 de emergencia hasta 2027).
@@ -277,7 +282,7 @@ pruebas/test_preguntas.py     tests de payload mínimo y preguntas locales
 pruebas/test_auth.py          tests de login (scrypt, sesiones, sin datos en claro)
 pruebas/test_historial.py     tests de historial aislado y poda/retención
 cliente/                      sitio estático: PDF en el navegador + historial local (localStorage/JSON)
-pruebas-js/                   tests del cliente con node:test (17 tests)
+pruebas-js/                   tests del cliente con node:test (12 archivos, 84 tests)
 src/api.py                    FastAPI: /api/cuadro /api/calcular /api/verificar/* /api/auditoria /api/auditar
 web/index.html                      UI: simulador + verificador + auditoría (3 pestañas)
 pruebas/test_tarifas.py             tests con valores esperados calculados a mano

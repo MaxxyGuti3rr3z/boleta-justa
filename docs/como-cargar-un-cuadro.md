@@ -56,22 +56,26 @@ Si el texto de la resolución no dice un valor, ese valor no se carga.
 ## 3. Validar el esquema
 
 ```bash
-cd C:/Users/hgmax/Desktop/bootcamp/boleta-justa
+cd boleta-justa
 py -3.13 scripts/validar_cuadro.py                       # valida todos los cuadros
 py -3.13 scripts/validar_cuadro.py datos/tarifas/resNNN_YYYY-MM.json  # uno solo
 ```
 
 El script comprueba campos obligatorios, fechas coherentes, bloques ordenados,
-sin solapamiento de vigencias entre cuadros e ignores la plantilla (`_`).
+sin solapamiento de vigencias entre cuadros e ignora la plantilla (`_`).
+También valida los campos opcionales `subperiodos`, `bonificaciones.partidas` y
+`referencia_normativa_sef_2026`: exigen resolución, fragmento y fuente HTTPS,
+categorías conocidas y vigencias que no se solapen.
 
 ## 4. Regenerar el cliente y probar
 
 ```bash
 py -3.13 scripts/generar_tablas_js.py
-for t in tarifas decreto parser auditoria explicar deploy limpieza preguntas auth historial cuadros; do
+py -3.13 scripts/generar_version_pwa.py      # actualiza version.json y la caché del SW
+for t in tarifas decreto parser auditoria cuadros explicar deploy limpieza preguntas auth historial paridad; do
   ./venv/Scripts/python.exe pruebas/test_$t.py
 done
-node --test pruebas-js/*.test.mjs
+node --test pruebas-js/*.test.mjs            # 12 archivos / 84 tests
 ```
 
 Si el cuadro nuevo coincide con una boleta local, la auditoría debe pasar de

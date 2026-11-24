@@ -1,6 +1,6 @@
 # Documentación general de Boleta Justa
 
-Fecha de esta versión: 21/11/2026.
+Fecha de esta versión: 24/11/2026.
 
 ## 1. Resumen ejecutivo
 
@@ -29,7 +29,7 @@ hogares vulnerables, impuestos que representan una parte importante del total,
 cortes que no respetarían los plazos del decreto de emergencia, falta de
 oficinas para reclamar en el interior y movimientos vecinales con miles de
 firmas. Todo eso está documentado con fuentes en `docs/marco-normativo.md` y en
-`C:/Users/hgmax/Desktop/proyectos-futuros/`.
+fichas de exploración que viven fuera de este repositorio.
 
 La hipótesis de trabajo fue: si la persona entiende su boleta y tiene el cuadro
 oficial al lado, puede detectar errores y reclamos con argumentos, sin depender
@@ -40,13 +40,20 @@ Proyecto hermano: `cuando-llega-jujuy`
 
 ## 3. Estado actual
 
-- Sitio estático publicado y verificado en navegador con una boleta real
+- Sitio estático publicado y verificado en navegador con una boleta ficticia
   (HTTP 200, resultado correcto, historial local funcionando).
 - API local funcionando con 19 endpoints.
-- 6 cuadros tarifarios históricos cargados desde el Boletín Oficial.
-- 10 suites de tests Python y 17 tests Node, todos verdes en CI.
-- Última verificación de CI: `success`.
-- Repositorios públicos, SHA local = remoto, sin cambios pendientes.
+- 6 cuadros tarifarios históricos cargados desde el Boletín Oficial, con
+  subperíodos de energía y bonificaciones documentadas (Res. 476/2025 y
+  105/2026) y la rectificación 104/2026.
+- Cliente con pdf.js local, CSP estricta, PWA instalable (manifest, service
+  worker y versión de caché) e identidad visual con fotos de Jujuy y créditos.
+- 12 suites de tests Python y 12 archivos / 84 tests Node, todos verdes.
+- `python scripts/validar_cuadro.py` y `pruebas-js/sin-cdn.test.mjs` (URLs
+  externas) también verdes.
+- Última verificación de CI en el commit publicado: `success`.
+- Los cambios de esta última iteración están en el árbol de trabajo, listos
+  para commitear y publicar (sin commit todavía).
 - Sin servidores corriendo de forma permanente.
 
 ## 4. Arquitectura
@@ -61,10 +68,12 @@ Hay dos superficies que comparten la misma lógica de negocio:
    │ parser.js                │          │ parser_boletas.py        │
    │ auditoria.js             │          │ auditoria.py             │
    │ explicar.js              │          │ explicar.py              │
-   │ payload.js / history.js  │          │ payload_ia / preguntas   │
-   │ localStorage             │          │ auth / historial         │
-   │ SIN BACKEND              │          │ SQLite opcional          │
-   └──────────────────────────┘          └──────────────────────────┘
+    │ payload.js / history.js  │          │ payload_ia / preguntas   │
+    │ formulario.js (manual)   │          │ auth / historial         │
+    │ resumen.js / reclamo.js  │          │ SQLite opcional          │
+    │ sw.js + manifest + img/  │          │                          │
+    │ localStorage / SIN BACKEND│         │                          │
+    └──────────────────────────┘          └──────────────────────────┘
         PDF nunca sale                       PDF se sube a localhost
         del dispositivo                       y se borra al terminar
 ```
@@ -72,6 +81,11 @@ Hay dos superficies que comparten la misma lógica de negocio:
 Regla: la lógica de negocio vive en `src/` (Python) y se replica en `cliente/`
 (JS). Los cuadros tarifarios son la fuente de verdad en `datos/tarifas/*.json`;
 `scripts/generar_tablas_js.py` genera `cliente/tablas.js` para el sitio estático.
+Los cuadros pueden definir `subperiodos` (precio de energía vigente dentro del
+trimestre) y `bonificaciones` con partidas documentadas; el calculador aplica
+el subperiodo sin tocar el VAD. La PWA se genera con
+`scripts/generar_version_pwa.py`: el hash de caché cubre datos, UI, fotos y
+créditos, y el service worker precachea solo assets estáticos (nunca el PDF).
 
 ## 5. Mapa de archivos
 
@@ -97,15 +111,19 @@ Regla: la lógica de negocio vive en `src/` (Python) y se replica en `cliente/`
 
 | Archivo | Responsabilidad |
 |---|---|
-| `index.html` | Landing de una página con aviso de privacidad, carga y resultados |
+| `index.html` | Landing con identidad Jujuy, carga, resultado, nav de anclas y créditos |
 | `app.js` | Orquesta lectura del PDF, análisis y render; conecta el historial local |
 | `parser.js` | Port del parser a JavaScript |
 | `auditoria.js` | Port de la auditoría (VAD + bloques) |
-| `explicar.js` | Port de las explicaciones en lenguaje llano |
+| `explicar.js` | Port de las explicaciones y avisos "a verificar" por resolución aplicada |
 | `payload.js` | Lista blanca y validación del payload exportable |
-| `history.js` | Historial en `localStorage`, exportación e importación JSON |
+| `history.js` | Historial en `localStorage`, copia de seguridad y recuperación |
+| `formulario.js` | Carga manual sin OCR: produce el mismo objeto interno del parser |
+| `resumen.js` / `reclamo.js` | Resumen para compartir y solicitud de desglose (sin veredictos) |
 | `tablas.js` | Generado desde los 6 JSON oficiales; no editar a mano |
-| `tarifas.js` | Port de `src/tarifas.py` (calculadora TS/SEF/RE), cubierto por tests de paridad |
+| `tarifas.js` | Port de `src/tarifas.py` con subperíodos y bonificaciones |
+| `sw.js` / `manifest.webmanifest` / `version.json` | PWA: precaché de assets, instalación y versión de caché |
+| `img/` / `creditos.html` | 3 fotos WebP (cabecera + 2) y créditos con licencias verificadas |
 | `vendor/pdfjs/` | pdf.js 6.5.438 + worker + LICENSE + README con hashes (sin CDN) |
 
 ### Datos, docs y tooling
@@ -116,7 +134,7 @@ Regla: la lógica de negocio vive en `src/` (Python) y se replica en `cliente/`
 - `docs/captura-*.png`: capturas de la UI (sin datos personales).
 - `scripts/generar_tablas_js.py`: regenera `tablas.js`.
 - `scripts/limpiar_sensibles.py`: limpieza controlada de datos sensibles.
-- `pruebas/` (10 suites) y `pruebas-js/` (5 archivos, 17 tests).
+- `pruebas/` (12 suites) y `pruebas-js/` (12 archivos, 84 tests).
 - `.github/workflows/tests.yml`: CI con Python 3.13 y Node 22.
 
 ## 6. Flujo de datos y privacidad
@@ -188,7 +206,8 @@ resolución del trimestre nov-2026/ene-2027 no estaba publicada/indexada en la
 - Carga de PDF por selector o arrastrar y soltar.
 - Auditoría con resolución elegida, confianza, comparación por renglón y notas.
 - Explicación en lenguaje llano y glosario desplegable.
-- Historial local: guardar, ver, borrar, descargar JSON e importar JSON.
+- Historial local: guardar, ver, borrar con confirmación, y copia de seguridad
+  (guardar/recuperar) para pasar los análisis a otro dispositivo.
 - Carga manual (sin OCR) para boletas en papel o PDF escaneado: si el PDF no
   tiene texto útil, se ofrece un formulario guiado que produce el mismo objeto
   interno que `parser.js` y reutiliza la auditoría y la explicación.
@@ -231,7 +250,7 @@ resolución del trimestre nov-2026/ene-2027 no estaba publicada/indexada en la
 Requisitos: Python 3.13 con `venv`, Node 22 para los tests JS.
 
 ```bash
-cd C:/Users/hgmax/Desktop/bootcamp/boleta-justa
+cd boleta-justa
 py -3.13 -m venv venv
 ./venv/Scripts/python.exe -m pip install -r requirements.txt
 
@@ -243,7 +262,8 @@ py -3.13 scripts/generar_tablas_js.py
 py -3.13 -m http.server 8100 --directory cliente
 
 # Tests
-for t in tarifas decreto parser auditoria explicar deploy limpieza preguntas auth historial; do
+python scripts/validar_cuadro.py
+for t in tarifas decreto parser auditoria cuadros explicar deploy limpieza preguntas auth historial paridad; do
   ./venv/Scripts/python.exe pruebas/test_$t.py
 done
 node --test pruebas-js/*.test.mjs
@@ -270,13 +290,26 @@ Para desplegar con servidor: `Dockerfile` + `.dockerignore` excluyen
 ## 13. Limitaciones y pendientes
 
 - Actualización trimestral de cuadros; la resolución nov-2026/ene-2027 no está
-  cargada.
-- El sitio es 100% offline después de la primera carga: pdf.js y su worker
-  están empaquetados en `cliente/vendor/pdfjs/` (versión 6.5.438, hashes en
-  `cliente/vendor/pdfjs/README.md`). La CSP fija `connect-src 'self'`. El sitio
-  es PWA instalable: manifest con rutas relativas, íconos 192/512 y service
-  worker cache-first solo de assets; el PDF y los datos del usuario nunca se
-  cachean.
+  cargada. No se afirma que no exista: simplemente no está indexada ni cargada.
+- Los `subperiodos` y las `bonificaciones` se documentan con fragmento y fuente
+  del Boletín Oficial. Las partidas con origen distinto del decreto vigente no
+  se aplican automáticamente: requieren verificación con boleta real.
+- Los avisos "a verificar" se eligen por la **resolución aplicada** y citan
+  solo fuentes correspondientes a ese cuadro. No calculan diferencias, créditos
+  ni saldos y no son veredictos legales.
+- El sitio funciona offline después de la primera visita: pdf.js y su worker
+  están en `cliente/vendor/pdfjs/` (6.5.438, hashes en el README), las fotos
+  son WebP locales y la CSP fija `connect-src 'self'`. Es PWA instalable:
+  manifest con rutas relativas, íconos 192/512, service worker cache-first solo
+  de assets y versión de caché derivada de datos + UI + fotos. El PDF y los
+  datos del usuario nunca se cachean.
+- La cabecera y las secciones alternan fondos con fotos de Jujuy; tema claro
+  cálido por defecto y oscuro solo si `prefers-color-scheme` lo pide. Las
+  fuentes son del sistema y las licencias de las fotos están en
+  `cliente/creditos.html`.
+- El cliente revisa cargo fijo, uso de red, energía, tarifa social y punitorios
+  con su vigencia. La revisión de **plazos de corte** vive en la API
+  (`src/decreto.py`), no en el cliente estático.
 - Falta la comparación visual de varias boletas del historial local. El botón
   de copiar resumen para WhatsApp ya está implementado.
 - La UI de login/historial de la API no está conectada (backend listo).
@@ -301,7 +334,7 @@ Para desplegar con servidor: `Dockerfile` + `.dockerignore` excluyen
 
 - `cuando-llega-jujuy`: recorridos y paradas de OSM + reportes vecinales de
   frecuencia (https://github.com/MaxxyGuti3rr3z/cuando-llega-jujuy).
-- `C:/Users/hgmax/Desktop/proyectos-futuros/`: fichas P1-P5 con ideas
-  derivadas de la exploración (transporte, luz, salud, turismo, datos abiertos).
-- `C:/Users/hgmax/Desktop/bootcamp/jujuy-exploracion/`: informe original de la
-  exploración y fuentes citadas.
+- Fichas P1-P5 con ideas derivadas de la exploración (transporte, luz, salud,
+  turismo, datos abiertos), fuera de este repositorio.
+- Repositorio `jujuy-exploracion`: informe original de la exploración y fuentes
+  citadas.
