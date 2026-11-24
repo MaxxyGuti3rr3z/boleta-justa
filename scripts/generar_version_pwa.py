@@ -24,10 +24,18 @@ UI = ("index.html", "app.js", "parser.js", "auditoria.js", "explicar.js",
       "img/quebrada-tilcara-800.webp", "img/quebrada-tilcara-1600.webp",
       "img/salinas-800.webp", "img/salinas-1600.webp")
 
+def _bytes_normalizados(ruta: Path) -> bytes:
+    """CRLF -> LF solo en texto; los WebP son binarios y no se tocan."""
+    datos = ruta.read_bytes()
+    if ruta.suffix.lower() in {".json", ".js", ".html", ".webmanifest", ".css"}:
+        return datos.replace(b"\r\n", b"\n")
+    return datos
+
+
 archivos = sorted(p for p in TABLAS.glob("*.json") if not p.name.startswith("_"))
 interfaz = [CLIENTE / nombre for nombre in UI if (CLIENTE / nombre).exists()]
 fuentes = archivos + interfaz
-contenido = b"".join(p.read_bytes() for p in fuentes)
+contenido = b"".join(_bytes_normalizados(p) for p in fuentes)
 hash_version = hashlib.sha256(contenido).hexdigest()[:12]
 actualizado = date.fromtimestamp(max(p.stat().st_mtime for p in fuentes)).isoformat()
 resoluciones = [json.loads(p.read_text(encoding="utf-8"))["resolucion"] for p in archivos]
