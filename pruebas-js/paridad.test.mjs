@@ -21,8 +21,11 @@ for (const archivo of archivos) {
     const e = caso.entrada;
     let obtenido;
     if (caso.tipo === 'calcular') {
-      const { kwh, mes, ...opts } = e;
-      obtenido = calcular(kwh, mes || '2026-08', opts);
+      const { kwh, mes, resolucion, ...opts } = e;
+      const tabla = resolucion
+        ? TABLAS.find(t => t.resolucion.startsWith(resolucion))
+        : undefined;
+      obtenido = calcular(kwh, mes || '2026-08', opts, tabla);
     } else if (caso.tipo === 'auditar') {
       obtenido = auditar(e, TABLAS);
     } else {

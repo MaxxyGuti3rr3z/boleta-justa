@@ -356,6 +356,82 @@ export const TABLAS = [
    "hasta": "2026-01-31"
   },
   "nota_pass_through": "Cargos por consumo de energía pueden cambiar dentro del trimestre por resoluciones nacionales (Res. SE 434/437/2025). Cargo fijo y uso de red corresponden al VAD provincial y no cambian en el trimestre.",
+  "subperiodos": [
+   {
+    "id": "energia_2025-12_2026-01",
+    "desde": "2025-12-01",
+    "hasta": "2026-01-31",
+    "resolucion": "476-SUSEPU/2025",
+    "publicacion": "Boletín Oficial de Jujuy Nº 149, 29/12/2025",
+    "fuente": "https://boletinoficial.jujuy.gob.ar/?p=324884",
+    "fragmento": "ARTICULO 1º.- Aprobar los Cargos por Consumo de Energía plenos para el periodo 1° de diciembre de 2025 al 31 de enero de 2026 y las Bonificaciones del Anexo I, a aplicarse para el periodo 1° al 31 de diciembre 2025. ANEXO I CUADRO TARIFARIO PLENO (EJESA) Vigencia: 1° de diciembre 2025 al 31 de enero 2026. Cargos por Consumo de Energía (Plenos): R1 123,4896; R2 123,5417; R2-bis 123,5417; R3 123,4823; R4 123,4563; R5 123,4292; R6 123,4472; R7 123,4472.",
+    "alcance": "t1_residencial.categorias[].energia_plena_kwh",
+    "valores": {
+     "R1": 123.4896,
+     "R2": 123.5417,
+     "R2-bis": 123.5417,
+     "R3": 123.4823,
+     "R4": 123.4563,
+     "R5": 123.4292,
+     "R6": 123.4472,
+     "R7": 123.4472
+    }
+   }
+  ],
+  "bonificaciones": {
+   "nota": "Ene-26: sin importes $/kWh verificados. La Res. 476-SUSEPU/2025 limita las bonificaciones del Anexo I al 1-31/12/2025 (Art. 1) y no se encontró publicación oficial con valores $/kWh para enero 2026; no se infieren por parecido. Si aparece la resolución, cargarla con valor + fragmento + fuente.",
+   "2025-12": {
+    "nota": "Bonificaciones vigentes 1-31/12/2025 según Art. 1 de la Res. 476/2025. Origen: Res. SE 26/2024, distinto del Decreto 943/2025 de los cuadros posteriores. Se documentan con su fuente; NO se aplican automáticamente: la imputación a cada usuario y la relación entre partidas requieren verificación con boleta real.",
+    "partidas": [
+     {
+      "id": "ts_dic25",
+      "origen": {
+       "resolucion": "476-SUSEPU/2025",
+       "norma_base": "Subsidio otorgado por el Gobierno Provincial (Tarifa Social)",
+       "fuente": "https://boletinoficial.jujuy.gob.ar/?p=324884",
+       "fragmento": "SUBSIDIO OTORGADO POR EL GOBIERNO PROVINCIAL BONIFICACIONES - T1 Residenciales - Tarifa Social Dic-25 - Cargos Fijos: TS1 -4.218, TS2 -4.995, RE -23.214. Cargos por Uso de Red: TS1 -19,6336, TS2 -11,9728, RE -78,5342."
+      },
+      "desde": "2025-12-01",
+      "hasta": "2025-12-31",
+      "tipo": "cargo_fijo_y_uso_red",
+      "valores": {
+       "cargo_fijo": {
+        "TS1": -4218,
+        "TS2": -4995,
+        "RE": -23214
+       },
+       "uso_red_kwh": {
+        "TS1": -19.6336,
+        "TS2": -11.9728,
+        "RE": -78.5342
+       }
+      }
+     },
+     {
+      "id": "sef_dic25",
+      "origen": {
+       "resolucion": "476-SUSEPU/2025",
+       "norma_base": "RESOLUCION SE N°26/2024 SECRETARIA DE ENERGÍA DE LA NACIÓN",
+       "fuente": "https://boletinoficial.jujuy.gob.ar/?p=324884",
+       "fragmento": "RESOLUCION SE N°26/2024 SECRETARIA DE ENERGÍA DE LA NACIÓN BONIFICACION Dic-25 - Cargo Por Consumo de Energía SEGMENTO N2: R1-N2 -63,8123, R2-N2 -63,8462, R2-bis-N2 -63,8462. SEGMENTO N3: R1-N3 -49,0864, R2-N3 -49,1125. Cargo Por Consumo de Energía: RC -63,7847, RE -123,4896."
+      },
+      "desde": "2025-12-01",
+      "hasta": "2025-12-31",
+      "tipo": "energia_bloques",
+      "nota": "N2 y N3 son segmentos alternativos del mismo beneficio; no se decide aquí cuál corresponde a cada usuario.",
+      "valores": {
+       "R1-N2": -63.8123,
+       "R2-N2": -63.8462,
+       "R2-bis-N2": -63.8462,
+       "R1-N3": -49.0864,
+       "R2-N3": -49.1125,
+       "RC": -63.7847,
+       "RE": -123.4896
+      }
+     }
+    ]
+   }
+  },
   "t1_residencial": {
    "categorias": [
     {

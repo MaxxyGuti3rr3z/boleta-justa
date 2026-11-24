@@ -30,9 +30,13 @@ def main():
         caso = json.loads(archivo.read_text(encoding="utf-8"))
         e = caso["entrada"]
         if caso["tipo"] == "calcular":
-            opciones = {k: v for k, v in e.items() if k not in ("kwh", "mes")}
+            opciones = {k: v for k, v in e.items()
+                        if k not in ("kwh", "mes", "resolucion")}
+            tabla = (next(t for t in TABLAS
+                          if t["resolucion"].startswith(e["resolucion"]))
+                     if "resolucion" in e else RES297)
             obtenido = tarifas.calcular(e["kwh"], e.get("mes", "2026-08"),
-                                        tarifas=RES297, **opciones)
+                                        tarifas=tabla, **opciones)
         elif caso["tipo"] == "auditar":
             obtenido = auditoria.auditar(e, TABLAS)
         else:

@@ -1,0 +1,26 @@
+{
+  "id": "29_subperiodo_476_2026-01_100kwh",
+  "tipo": "calcular",
+  "entrada": {
+    "kwh": 100,
+    "mes": "2026-01",
+    "resolucion": "420"
+  },
+  "esperado": {
+    "mes": "2026-01",
+    "kwh": 100,
+    "categoria": "R1",
+    "resolucion": "420-SUSEPU/2025",
+    "cargo_fijo": 4218.0,
+    "uso_red_bruto": 7853.42,
+    "energia_bruta": 12348.96,
+    "descuento_tarifa_social_fijo": 0.0,
+    "descuento_tarifa_social_red": 0.0,
+    "descuento_sef_energia": 0.0,
+    "subtotal_tarifario": 24420.38,
+    "notas": [
+      "energía según 476-SUSEPU/2025 (2025-12-01 a 2026-01-31)",
+      "subtotal SIN impuestos (IVA, tasas municipales, etc.): esa capa se suma en la boleta real"
+    ]
+  }
+}
