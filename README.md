@@ -310,5 +310,5 @@ docs/captura-*.png                  capturas de la UI
 ## Aliados
 
 Vecinos autoconvocados por la emergencia tarifaria, centros vecinales,
-defensorías, JujuyDev. Ver plan completo en
-`C:\Users\hgmax\Desktop\proyectos-futuros\P2-boleta-justa.md`.
+defensorías, JujuyDev. Ver plan completo en la ficha P2 de
+`proyectos-futuros/` (fuera de este repositorio).

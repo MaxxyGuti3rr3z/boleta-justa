@@ -315,6 +315,11 @@ Para desplegar con servidor: `Dockerfile` + `.dockerignore` excluyen
 - La UI de login/historial de la API no está conectada (backend listo).
 - Solo se validó el parser con boletas EJESA de los formatos relevados; un PDF
   escaneado no se analiza con OCR: se ofrece la carga manual guiada.
+- Corrimiento horizontal del layout observado solo en Brave al alejar el zoom;
+  no reproducible en Chromium headless en 1280/1920/2560/3200/3840 px ni con
+  zoom 125-200 %. Sin cambios necesarios en el CSS. Queda cubierto por
+  `pruebas-js/layout.test.mjs`, que también verifica el diálogo de borrado a
+  360 y 768 px.
 
 ## 14. Glosario
 
